@@ -1,0 +1,14 @@
+# ── Agent layer dependencies ──────────────────────────────────────────────────
+# Install AFTER requirements.txt is working:
+#   pip install -r requirements-agents.txt
+
+# Google Gemini (free tier: gemini-1.5-flash)
+google-generativeai>=0.7.0
+
+# LangChain ecosystem (for agent orchestration)
+langchain>=0.3.7
+langchain-google-genai>=2.0.0
+langchain-community>=0.3.3
+
+# numpy 2.x — has Python 3.13 wheels
+numpy>=2.0.0
