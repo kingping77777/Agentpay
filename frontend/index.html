@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentPay — Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════════════════════════════
+       ROOT TOKENS
+    ═══════════════════════════════════════════════════════════════════ */
+    :root {
+      --bg:        #0a0c12;
+      --panel:     #0f1320;
+      --panel2:    #141826;
+      --border:    #1e2a42;
+      --green:     #00ff41;
+      --amber:     #ffb400;
+      --cyan:      #00cfff;
+      --purple:    #a855f7;
+      --red:       #ff4444;
+      --blue:      #3b82f6;
+      --text:      #c8d8f0;
+      --dim:       #4a5568;
+      --pixel:     'Press Start 2P', monospace;
+      --mono:      'Share Tech Mono', monospace;
+      --tile-size: 32px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RESET + BASE
+    ═══════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--mono); }
+
+    /* scrollbars */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--panel); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       LAYOUT GRID
+    ═══════════════════════════════════════════════════════════════════ */
+    #app {
+      display: grid;
+      grid-template-rows: 48px 1fr 160px;
+      grid-template-columns: 1fr;
+      height: 100vh;
+      gap: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       TOP BAR
+    ═══════════════════════════════════════════════════════════════════ */
+    #topbar {
+      background: var(--panel);
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 20px;
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-icon {
+      width: 28px; height: 28px;
+      background: var(--purple);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--pixel);
+      font-size: 10px;
+      color: white;
+      image-rendering: pixelated;
+    }
+    .logo-text {
+      font-family: var(--pixel);
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: 1px;
+    }
+    .logo-version {
+      font-family: var(--pixel);
+      font-size: 7px;
+      color: var(--green);
+      background: rgba(0,255,65,.12);
+      border: 1px solid var(--green);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .topbar-sep { flex: 1; }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .status-label { font-size: 11px; color: var(--green); }
+    .topbar-clock { font-family: var(--pixel); font-size: 9px; color: var(--amber); }
+    .session-badge {
+      font-family: var(--pixel); font-size: 7px;
+      background: var(--panel2); border: 1px solid var(--border);
+      padding: 4px 8px; border-radius: 4px; color: var(--dim);
+    }
+    .session-badge span { color: var(--cyan); }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       MAIN AREA
+    ═══════════════════════════════════════════════════════════════════ */
+    #main {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       PIXEL ART OFFICE (LEFT PANEL)
+    ═══════════════════════════════════════════════════════════════════ */
+    #office {
+      position: relative;
+      overflow: hidden;
+      background: #1a2a1a;
+      background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: var(--tile-size) var(--tile-size);
+      border-right: 2px solid var(--border);
+    }
+
+    /* Floor tiles */
+    .floor {
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent, transparent 31px,
+          rgba(0,0,0,.25) 31px, rgba(0,0,0,.25) 32px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent, transparent 31px,
+          rgba(0,0,0,.25) 31px, rgba(0,0,0,.25) 32px
+        );
+      background-color: #1e3a1e;
+    }
+
+    /* Room areas */
+    .room {
+      position: absolute;
+      border: 2px solid rgba(255,255,255,.08);
+    }
+    .conference-room {
+      top: 8px; left: 8px;
+      width: 180px; height: 140px;
+      background: #162a16;
+      border-color: rgba(255,255,255,.12);
+    }
+    .conference-label {
+      position: absolute;
+      top: 4px; left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--pixel); font-size: 5px;
+      color: rgba(255,255,255,.4);
+      white-space: nowrap;
+    }
+    .server-room {
+      bottom: 8px; right: 8px;
+      width: 100px; height: 80px;
+      background: #0a1a2a;
+      border-color: var(--cyan);
+    }
+    .server-label {
+      position: absolute;
+      bottom: 4px; left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--pixel); font-size: 5px;
+      color: var(--cyan);
+      white-space: nowrap;
+    }
+
+    /* Conference table */
+    .conf-table {
+      position: absolute;
+      top: 30px; left: 20px;
+      width: 140px; height: 70px;
+      background: #4a3520;
+      border: 2px solid #6a5530;
+      border-radius: 4px;
+    }
+    .conf-chair {
+      position: absolute;
+      width: 14px; height: 14px;
+      background: #8b4513;
+      border: 1px solid #a0522d;
+      border-radius: 2px;
+    }
+
+    /* Desks */
+    .desk {
+      position: absolute;
+      background: #3a2a18;
+      border: 2px solid #5a4028;
+    }
+    .desk::after {
+      content: '';
+      position: absolute;
+      top: 4px; left: 4px;
+      right: 4px; height: 8px;
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 1px;
+    }
+
+    /* ─── Characters ─── */
+    .character {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      transition: transform .1s;
+      z-index: 10;
+    }
+    .character:hover { transform: scale(1.08); }
+
+    /* sprite layers */
+    .sprite {
+      position: relative;
+      width: 24px; height: 36px;
+      image-rendering: pixelated;
+    }
+    .sprite .head {
+      position: absolute;
+      top: 0; left: 4px;
+      width: 16px; height: 14px;
+      border-radius: 3px;
+    }
+    .sprite .body {
+      position: absolute;
+      top: 16px; left: 2px;
+      width: 20px; height: 14px;
+      border-radius: 2px;
+    }
+    .sprite .leg-l {
+      position: absolute;
+      bottom: 0; left: 4px;
+      width: 7px; height: 8px;
+    }
+    .sprite .leg-r {
+      position: absolute;
+      bottom: 0; right: 4px;
+      width: 7px; height: 8px;
+    }
+    .sprite .eye-l, .sprite .eye-r {
+      position: absolute;
+      top: 5px;
+      width: 3px; height: 3px;
+      background: rgba(0,0,0,.7);
+      border-radius: 50%;
+    }
+    .sprite .eye-l { left: 6px; }
+    .sprite .eye-r { right: 6px; }
+    .sprite .hair {
+      position: absolute;
+      top: 0; left: 4px;
+      width: 16px; height: 5px;
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* character label */
+    .char-label {
+      font-family: var(--pixel);
+      font-size: 5.5px;
+      text-align: center;
+      white-space: nowrap;
+      text-shadow: 1px 1px 0 black;
+    }
+    .char-status {
+      font-family: var(--pixel);
+      font-size: 5px;
+      padding: 1px 4px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .status-online  { background: rgba(0,255,65,.2);  color: var(--green); border: 1px solid var(--green); }
+    .status-active  { background: rgba(168,85,247,.2); color: var(--purple); border: 1px solid var(--purple); }
+    .status-idle    { background: rgba(255,180,0,.2);  color: var(--amber); border: 1px solid var(--amber); }
+
+    /* speech bubble */
+    .bubble {
+      position: absolute;
+      background: #1a2a3a;
+      border: 1.5px solid var(--cyan);
+      border-radius: 6px 6px 6px 0;
+      padding: 5px 8px;
+      font-size: 6px;
+      line-height: 1.6;
+      max-width: 140px;
+      color: var(--text);
+      z-index: 20;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+    }
+    .bubble.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -7px; left: 8px;
+      border: 4px solid transparent;
+      border-top-color: var(--cyan);
+    }
+    .bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -5px; left: 9px;
+      border: 3px solid transparent;
+      border-top-color: #1a2a3a;
+    }
+
+    /* server rack */
+    .server-rack {
+      position: absolute;
+      top: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .rack-unit {
+      height: 8px;
+      background: #0a0f1a;
+      border: 1px solid #1a3a5a;
+      border-radius: 1px;
+      display: flex;
+      align-items: center;
+      padding: 0 3px;
+      gap: 2px;
+    }
+    .rack-led {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      animation: rack-blink 1.5s ease-in-out infinite;
+    }
+    @keyframes rack-blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* memory replay button */
+    #memory-replay {
+      position: absolute;
+      bottom: 12px; left: 12px;
+      font-family: var(--pixel);
+      font-size: 8px;
+      background: var(--panel);
+      border: 2px solid var(--purple);
+      color: var(--purple);
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all .2s;
+      z-index: 30;
+    }
+    #memory-replay:hover {
+      background: var(--purple);
+      color: white;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RIGHT PANEL — COMMAND CENTER
+    ═══════════════════════════════════════════════════════════════════ */
+    #command-center {
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    /* agent header */
+    .cc-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel2);
+    }
+    .cc-avatar {
+      width: 42px; height: 42px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #1a2a4a, #2a3a6a);
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .cc-agent-info { flex: 1; }
+    .cc-agent-name {
+      font-family: var(--pixel); font-size: 10px;
+      color: white; margin-bottom: 3px;
+    }
+    .cc-agent-role { font-size: 11px; color: var(--dim); }
+    .cc-all-active {
+      font-family: var(--pixel); font-size: 7px;
+      background: rgba(0,255,65,.12); border: 1px solid var(--green);
+      color: var(--green); padding: 4px 8px; border-radius: 3px;
+    }
+
+    /* tabs */
+    .cc-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel2);
+      overflow-x: auto;
+    }
+    .cc-tab {
+      font-family: var(--pixel); font-size: 7px;
+      padding: 8px 12px;
+      cursor: pointer;
+      color: var(--dim);
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all .15s;
+    }
+    .cc-tab:hover { color: var(--text); }
+    .cc-tab.active {
+      color: var(--amber);
+      border-bottom-color: var(--amber);
+    }
+
+    /* chat log */
+    #chat-log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      animation: fade-in .3s ease;
+    }
+    @keyframes fade-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    .msg-header {
+      font-family: var(--pixel); font-size: 6px;
+      color: var(--dim); display: flex; gap: 8px; align-items: center;
+    }
+    .msg-agent-badge {
+      padding: 2px 6px; border-radius: 2px;
+      font-family: var(--pixel); font-size: 6px;
+    }
+    .badge-sales    { background: rgba(0,207,255,.15); color: var(--cyan); border: 1px solid var(--cyan); }
+    .badge-merchant { background: rgba(255,180,0,.15); color: var(--amber); border: 1px solid var(--amber); }
+    .badge-authority{ background: rgba(168,85,247,.15); color: var(--purple); border: 1px solid var(--purple); }
+    .badge-user     { background: rgba(59,130,246,.15); color: var(--blue); border: 1px solid var(--blue); }
+
+    .msg-body {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+    .msg-body.user-msg {
+      color: #a8c8ff;
+    }
+
+    /* product cards in chat */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .product-card {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      cursor: pointer;
+      transition: border-color .15s, transform .1s;
+    }
+    .product-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+    .product-card-name { font-size: 11px; font-weight: bold; color: white; margin-bottom: 4px; }
+    .product-card-brand { font-size: 10px; color: var(--dim); margin-bottom: 4px; }
+    .product-card-price {
+      font-family: var(--pixel); font-size: 9px;
+      color: var(--green);
+    }
+    .product-card-stock { font-size: 10px; color: var(--dim); margin-top: 3px; }
+
+    /* validation checks */
+    .validation-checks {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 6px;
+    }
+    .check-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; padding: 2px 0;
+    }
+    .check-pass { color: var(--green); }
+    .check-fail { color: var(--red); }
+
+    /* typing indicator */
+    #typing-indicator {
+      display: none;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: var(--dim);
+    }
+    #typing-indicator.visible { display: flex; align-items: center; gap: 8px; }
+    .typing-dots span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--dim);
+      border-radius: 50%;
+      animation: typing-bounce .9s ease-in-out infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: .15s; }
+    .typing-dots span:nth-child(3) { animation-delay: .3s; }
+    @keyframes typing-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+    /* chat input */
+    .cc-input-area {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #chat-input {
+      width: 100%;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 10px 12px;
+      resize: none;
+      height: 48px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    #chat-input:focus { border-color: var(--cyan); }
+    #chat-input::placeholder { color: var(--dim); }
+    .input-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    #btn-send {
+      font-family: var(--pixel); font-size: 8px;
+      background: var(--amber);
+      color: black;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    #btn-send:hover { opacity: .85; }
+    #btn-send:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-mode {
+      font-family: var(--pixel); font-size: 7px;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--dim); padding: 6px 12px; border-radius: 4px;
+      cursor: pointer; transition: all .15s;
+    }
+    .btn-mode:hover { border-color: var(--text); color: var(--text); }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       BOTTOM BAR — AGENT STATUS CARDS
+    ═══════════════════════════════════════════════════════════════════ */
+    #bottom-bar {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      border-top: 2px solid var(--border);
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    .agent-card {
+      padding: 10px 12px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .agent-card:last-child { border-right: none; }
+
+    .agent-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .agent-avatar {
+      width: 32px; height: 32px;
+      border-radius: 5px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      image-rendering: pixelated;
+    }
+    .agent-card-info { flex: 1; min-width: 0; }
+    .agent-card-name {
+      font-family: var(--pixel); font-size: 6px;
+      color: white; margin-bottom: 2px;
+    }
+    .agent-card-model { font-size: 9px; color: var(--dim); }
+    .agent-card-focus { font-size: 9px; color: var(--dim); }
+    .agent-led {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: blink 2s infinite;
+    }
+    .led-green  { background: var(--green);  box-shadow: 0 0 6px var(--green); }
+    .led-purple { background: var(--purple); box-shadow: 0 0 6px var(--purple); }
+    .led-amber  { background: var(--amber);  box-shadow: 0 0 6px var(--amber); }
+    .led-status {
+      font-family: var(--pixel); font-size: 6px;
+      margin-left: 2px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+    }
+    .stat-label { color: var(--dim); width: 50px; flex-shrink: 0; }
+    .stat-val   { color: var(--text); width: 24px; text-align: right; flex-shrink: 0; }
+    .bar-track {
+      flex: 1;
+      height: 5px;
+      background: var(--panel2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .6s ease;
+    }
+    .bar-green  { background: var(--green); }
+    .bar-amber  { background: var(--amber); }
+    .bar-purple { background: var(--purple); }
+    .bar-blue   { background: var(--blue); }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       WALK ANIMATIONS
+    ═══════════════════════════════════════════════════════════════════ */
+    @keyframes walk-x {
+      0%   { transform: translateX(0px);  }
+      50%  { transform: translateX(24px); }
+      100% { transform: translateX(0px);  }
+    }
+    @keyframes bob {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-3px); }
+    }
+    .customer-char .sprite { animation: bob 1s ease-in-out infinite; }
+
+    /* working animation */
+    @keyframes work-bob {
+      0%,100% { transform: rotate(0deg); }
+      25%  { transform: rotate(2deg); }
+      75%  { transform: rotate(-2deg); }
+    }
+    .working .sprite { animation: work-bob .8s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══════════════════════ TOP BAR ═══════════════════════ -->
+  <header id="topbar">
+    <div class="logo">
+      <div class="logo-icon">A</div>
+      <span class="logo-text">AgentPay</span>
+      <span class="logo-version">v1.0.0 — auto mode on</span>
+    </div>
+    <div class="topbar-sep"></div>
+    <div class="status-dot"></div>
+    <span class="status-label">System Online</span>
+    <span class="topbar-clock" id="clock">⏰ 00:00:00 AM</span>
+    <div class="session-badge">Session: <span id="session-badge-id">#AGP-0000</span></div>
+  </header>
+
+  <!-- ═══════════════════════ MAIN ═══════════════════════ -->
+  <div id="main">
+
+    <!-- ───────── OFFICE (LEFT) ───────── -->
+    <div id="office">
+      <div class="floor"></div>
+
+      <!-- Conference Room -->
+      <div class="room conference-room">
+        <span class="conference-label">CONFERENCE ROOM</span>
+        <div class="conf-table">
+          <!-- chairs around table -->
+          <div class="conf-chair" style="top:-16px;left:20px"></div>
+          <div class="conf-chair" style="top:-16px;left:50px"></div>
+          <div class="conf-chair" style="top:-16px;left:80px"></div>
+          <div class="conf-chair" style="top:78px;left:20px"></div>
+          <div class="conf-chair" style="top:78px;left:50px"></div>
+          <div class="conf-chair" style="top:78px;left:80px"></div>
+        </div>
+      </div>
+
+      <!-- Desks -->
+      <div class="desk" style="top:160px;left:20px;width:70px;height:40px"></div>
+      <div class="desk" style="top:160px;left:110px;width:70px;height:40px"></div>
+      <div class="desk" style="top:240px;left:20px;width:70px;height:40px"></div>
+      <div class="desk" style="top:240px;left:110px;width:70px;height:40px"></div>
+      <div class="desk" style="top:160px;right:160px;width:70px;height:40px"></div>
+      <div class="desk" style="top:240px;right:160px;width:70px;height:40px"></div>
+
+      <!-- Server Room -->
+      <div class="room server-room">
+        <span class="server-label">SERVER ROOM</span>
+        <div class="server-rack">
+          <div class="rack-unit"><div class="rack-led" style="background:var(--green);animation-delay:.0s"></div><div class="rack-led" style="background:var(--green);animation-delay:.3s"></div><div class="rack-led" style="background:var(--amber);animation-delay:.6s"></div></div>
+          <div class="rack-unit"><div class="rack-led" style="background:var(--green);animation-delay:.2s"></div><div class="rack-led" style="background:var(--green);animation-delay:.5s"></div></div>
+          <div class="rack-unit"><div class="rack-led" style="background:var(--cyan);animation-delay:.1s"></div><div class="rack-led" style="background:var(--green);animation-delay:.4s"></div></div>
+          <div class="rack-unit"><div class="rack-led" style="background:var(--green);animation-delay:.7s"></div><div class="rack-led" style="background:var(--purple);animation-delay:.2s"></div></div>
+        </div>
+      </div>
+
+      <!-- ─── MERCHANT ADMIN character ─── -->
+      <div class="character working" id="char-merchant" style="top:60px;left:36px" title="Merchant Admin">
+        <div class="bubble" id="bubble-merchant">Let me check merchant policy...</div>
+        <div class="sprite">
+          <div class="hair" style="background:#c0392b"></div>
+          <div class="head" style="background:#f5cba7"></div>
+          <div class="eye-l"></div><div class="eye-r"></div>
+          <div class="body" style="background:#2980b9"></div>
+          <div class="leg-l" style="background:#1a5276"></div>
+          <div class="leg-r" style="background:#1a5276"></div>
+        </div>
+        <span class="char-label" style="color:#e8a0a0">Merchant Admin</span>
+      </div>
+
+      <!-- ─── SALES AGENT character ─── -->
+      <div class="character working" id="char-sales" style="top:140px;left:200px" title="Sales Agent">
+        <div class="bubble" id="bubble-sales">Searching products...</div>
+        <div class="sprite">
+          <div class="hair" style="background:#27ae60"></div>
+          <div class="head" style="background:#f5cba7"></div>
+          <div class="eye-l"></div><div class="eye-r"></div>
+          <div class="body" style="background:#27ae60"></div>
+          <div class="leg-l" style="background:#1e8449"></div>
+          <div class="leg-r" style="background:#1e8449"></div>
+        </div>
+        <span class="char-label" style="color:#82e0aa">Sales Agent</span>
+        <span class="char-status status-online">Online</span>
+      </div>
+
+      <!-- ─── CUSTOMER character ─── -->
+      <div class="character customer-char" id="char-customer" style="top:220px;left:280px" title="Customer">
+        <div class="bubble" id="bubble-customer">I need a laptop...</div>
+        <div class="sprite">
+          <div class="hair" style="background:#8e44ad"></div>
+          <div class="head" style="background:#f5cba7"></div>
+          <div class="eye-l"></div><div class="eye-r"></div>
+          <div class="body" style="background:#9b59b6"></div>
+          <div class="leg-l" style="background:#6c3483"></div>
+          <div class="leg-r" style="background:#6c3483"></div>
+        </div>
+        <span class="char-label" style="color:#d7bde2">Customer</span>
+      </div>
+
+      <!-- ─── AUTHORITY AGENT character ─── -->
+      <div class="character working" id="char-authority" style="bottom:100px;left:120px" title="Authority Agent">
+        <div class="bubble" id="bubble-authority">Validating policy...</div>
+        <div class="sprite">
+          <div class="hair" style="background:#2c3e50"></div>
+          <div class="head" style="background:#f5cba7"></div>
+          <div class="eye-l"></div><div class="eye-r"></div>
+          <div class="body" style="background:#e74c3c"></div>
+          <div class="leg-l" style="background:#922b21"></div>
+          <div class="leg-r" style="background:#922b21"></div>
+        </div>
+        <span class="char-label" style="color:#f1948a">Authority Agent</span>
+        <span class="char-status status-active">Active</span>
+      </div>
+
+      <!-- ─── MERCHANT AGENT character ─── -->
+      <div class="character working" id="char-merchant-agent" style="bottom:100px;right:200px" title="Merchant Agent">
+        <div class="bubble" id="bubble-merchant-agent">Checking upsells...</div>
+        <div class="sprite">
+          <div class="hair" style="background:#f39c12"></div>
+          <div class="head" style="background:#f5cba7"></div>
+          <div class="eye-l"></div><div class="eye-r"></div>
+          <div class="body" style="background:#e67e22"></div>
+          <div class="leg-l" style="background:#a04000"></div>
+          <div class="leg-r" style="background:#a04000"></div>
+        </div>
+        <span class="char-label" style="color:#fad7a0">Merchant Agent</span>
+        <span class="char-status status-active">Active</span>
+      </div>
+
+      <button id="memory-replay">📼 Memory Replay</button>
+    </div>
+
+    <!-- ───────── COMMAND CENTER (RIGHT) ───────── -->
+    <div id="command-center">
+      <div class="cc-header">
+        <div class="cc-avatar" id="active-agent-avatar">🤖</div>
+        <div class="cc-agent-info">
+          <div class="cc-agent-name" id="active-agent-name">COMMAND CENTER</div>
+          <div class="cc-agent-role" id="active-agent-role">AI Commerce Platform</div>
+        </div>
+        <div class="cc-all-active">All Systems Active</div>
+      </div>
+
+      <div class="cc-tabs">
+        <div class="cc-tab active" data-tab="general">⊕ General</div>
+        <div class="cc-tab" data-tab="prompt">⊙ Prompt</div>
+        <div class="cc-tab" data-tab="usage">⊙ Usage</div>
+        <div class="cc-tab" data-tab="memory">⊙ Memory</div>
+        <div class="cc-tab" data-tab="graph">⊙ Graph</div>
+        <div class="cc-tab" data-tab="actions">⊙ Actions</div>
+        <div class="cc-tab" data-tab="config">⊙ Config</div>
+      </div>
+
+      <div id="chat-log">
+        <!-- welcome message -->
+        <div class="msg">
+          <div class="msg-header">
+            <span class="msg-agent-badge badge-sales">SALES_AGENT</span>
+            <span>System</span>
+          </div>
+          <div class="msg-body">
+🟢 AgentPay Command Center is online.
+
+Three specialized agents are ready:
+• <span style="color:var(--cyan)">Sales Agent</span> — Product discovery & cart
+• <span style="color:var(--amber)">Merchant Agent</span> — Upsells & promotions  
+• <span style="color:var(--purple)">Authority Agent</span> — Policy enforcement
+
+Try: <em style="color:var(--green)">"Show me laptops under ₹50000"</em>
+Or:  <em style="color:var(--green)">"checkout"</em> to trigger the Authority Agent</div>
+        </div>
+      </div>
+
+      <div id="typing-indicator">
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+        <span id="typing-agent-label">Agent thinking...</span>
+      </div>
+
+      <div class="cc-input-area">
+        <textarea id="chat-input" placeholder="Message agents..." rows="2"></textarea>
+        <div class="input-actions">
+          <button class="btn-mode" id="btn-auto-mode">⬩ Semi-Auto</button>
+          <button id="btn-send">▶ SEND</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- ═══════════════════════ BOTTOM BAR ═══════════════════════ -->
+  <div id="bottom-bar">
+    <!-- filled by JS -->
+  </div>
+
+</div><!-- /app -->
+
+<script src="app.js"></script>
+</body>
+</html>
