@@ -47,16 +47,35 @@ class SalesAgent:
         self.model = settings.GEMINI_MODEL
 
     def _fallback_intent(self, message: str) -> dict:
+        import re
         msg = message.lower()
         if any(k in msg for k in ["view cart", "show cart", "my cart", "what is in cart", "cart items"]) and "add" not in msg:
             return {"intent": "view_cart", "query": ""}
         if any(k in msg for k in ["add", "buy", "put", "want"]) and "cart" in msg:
-            clean = message.replace("add", "").replace("Add", "").replace("to my cart", "").replace("to cart", "").replace("I want to buy", "").strip(" '\"`")
+            clean = re.sub(r'(?i)\b(add|put|to my cart|to cart|in my cart|into cart|i want to buy|i want)\b', '', message).strip(' \'"`,')
             return {"intent": "add_to_cart", "product_name": clean, "query": clean}
         if any(k in msg for k in ["remove", "delete", "drop"]) and "cart" in msg:
-            clean = message.replace("remove", "").replace("delete", "").replace("from my cart", "").replace("from cart", "").strip(" '\"`")
+            clean = re.sub(r'(?i)\b(remove|delete|drop|from my cart|from cart)\b', '', message).strip(' \'"`,')
             return {"intent": "remove_from_cart", "product_name": clean, "query": clean}
-        return {"intent": "search_products", "query": message}
+
+        max_price = 0
+        price_match = re.search(r'(?:under|below|less than|max|budget)\s*(?:₹|rs\.?|inr)?\s*(\d+(?:,\d+)*(?:k)?)', msg)
+        if price_match:
+            raw_p = price_match.group(1).replace(',', '').lower()
+            try:
+                if raw_p.endswith('k'):
+                    max_price = float(raw_p[:-1]) * 1000
+                else:
+                    max_price = float(raw_p)
+            except Exception:
+                pass
+
+        clean_query = re.sub(r'(?i)\b(show me|find|search for|list|give me|products?|under|below|less than|max|budget|rs\.?|inr|₹|\d+k?)\b', '', message).strip(' \'"`,')
+        return {
+            "intent": "search_products",
+            "query": clean_query or message,
+            "max_price": max_price,
+        }
 
     def _fallback_response(self, intent_type: str, action_result: dict, products: list, cart: dict | None) -> str:
         if intent_type in ("search_products", "product_info"):

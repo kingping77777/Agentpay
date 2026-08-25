@@ -34,6 +34,8 @@ async def search_products(
     limit: int = 6,
 ) -> list[dict]:
     """Search products by name/category/brand/price for a specific merchant."""
+    from sqlalchemy import or_
+
     stmt = (
         select(Product)
         .options(selectinload(Product.inventory))
@@ -43,7 +45,22 @@ async def search_products(
         )
     )
     if query:
-        stmt = stmt.where(Product.name.ilike(f"%{query}%"))
+        words = [w for w in query.strip().split() if len(w) > 1 and w.lower() not in ("the", "and", "for", "with", "show", "me", "some", "any", "want", "under", "below")]
+        if words:
+            word_clauses = []
+            for w in words:
+                word_clauses.append(Product.name.ilike(f"%{w}%"))
+                word_clauses.append(Product.category.ilike(f"%{w}%"))
+                word_clauses.append(Product.brand.ilike(f"%{w}%"))
+                word_clauses.append(Product.description.ilike(f"%{w}%"))
+            stmt = stmt.where(or_(*word_clauses))
+        else:
+            stmt = stmt.where(or_(
+                Product.name.ilike(f"%{query}%"),
+                Product.category.ilike(f"%{query}%"),
+                Product.brand.ilike(f"%{query}%"),
+            ))
+
     if category:
         stmt = stmt.where(Product.category.ilike(f"%{category}%"))
     if brand:
