@@ -53,31 +53,32 @@ app.include_router(products_router)
 app.include_router(payments_router)
 
 
-# ── Health check & Frontend UI ────────────────────────────────────────────────
+# ── Health check ──────────────────────────────────────────────────────────────
+@app.get("/health", tags=["health"])
+async def health():
+    return {"status": "ok"}
+
+
+@app.get("/api/health", tags=["health"])
+async def api_health():
+    return {
+        "service": "AgentPay API",
+        "version": "0.1.0",
+        "status": "ok",
+        "env": settings.NODE_ENV,
+    }
+
+
+# ── Frontend UI ───────────────────────────────────────────────────────────────
 import os
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend"))
 if os.path.exists(frontend_dir):
-    app.mount("/static", StaticFiles(directory=frontend_dir, html=True), name="static")
-
     @app.get("/app", include_in_schema=False)
     async def serve_app():
         return FileResponse(os.path.join(frontend_dir, "index.html"))
 
-
-@app.get("/", tags=["health"])
-async def root():
-    return {
-        "service": "AgentPay API",
-        "version": "0.1.0",
-        "status": "ok",
-        "env": settings.NODE_ENV,
-        "ui": "/app",
-    }
-
-
-@app.get("/health", tags=["health"])
-async def health():
-    return {"status": "ok"}
+    app.mount("/static", StaticFiles(directory=frontend_dir, html=True), name="static")
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
