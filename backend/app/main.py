@@ -59,6 +59,41 @@ async def health():
     return {"status": "ok"}
 
 
+# ── WebSockets for Live Multi-Agent Collaboration ─────────────────────────────
+from fastapi import WebSocket, WebSocketDisconnect
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(message)
+            except Exception:
+                pass
+
+ws_manager = ConnectionManager()
+
+@app.websocket("/ws/agents")
+async def websocket_agents_endpoint(websocket: WebSocket):
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_json({"type": "HEARTBEAT", "status": "CONNECTED"})
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+
+
 @app.get("/api/health", tags=["health"])
 async def api_health():
     return {
@@ -75,10 +110,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend"))
-if os.path.exists(frontend_dir):
+dist_dir = os.path.join(frontend_dir, "dist")
+target_dir = dist_dir if os.path.exists(os.path.join(dist_dir, "index.html")) else frontend_dir
+
+if os.path.exists(target_dir):
     @app.get("/app", include_in_schema=False)
     async def serve_app():
-        return FileResponse(os.path.join(frontend_dir, "index.html"))
+        return FileResponse(os.path.join(target_dir, "index.html"))
 
-    app.mount("/static", StaticFiles(directory=frontend_dir, html=True), name="static")
-    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+    app.mount("/static", StaticFiles(directory=target_dir, html=True), name="static")
+    app.mount("/", StaticFiles(directory=target_dir, html=True), name="frontend")

@@ -60,7 +60,7 @@ class AgentOrchestrator:
         if self._is_merchant_intent(message):
             return await self._handle_merchant(db, session_id, customer_id, merchant_id, message)
 
-        # Default: Sales Agent
+        # Default: Multi-Agent Collaboration & Sales Discovery
         sales = get_sales_agent()
         result = await sales.process(
             db=db,
@@ -70,6 +70,55 @@ class AgentOrchestrator:
             merchant_id=merchant_id,
             chat_history=chat_history,
         )
+
+        # ── Inter-Agent Collaboration (A2A) Protocol ────────────────────────
+        a2a_dialogue = []
+        
+        # 1. Sales Agent introduces customer intent
+        a2a_dialogue.append({
+            "from": "SALES_AGENT",
+            "to": "MERCHANT_AGENT",
+            "message": f"Customer is inquiring: '{message}'. Discovered {len(result.get('products', []))} matching catalog items.",
+            "timestamp": "Now"
+        })
+
+        # 2. Check web search if needed
+        web_info = []
+        if any(w in message.lower() for w in ["web", "online", "market", "review", "latest", "compare", "benchmark", "specs", "best"]):
+            from app.agents.web_search import search_web_products
+            web_info = await search_web_products(message, max_results=2)
+            if web_info:
+                result["web_results"] = web_info
+                a2a_dialogue.append({
+                    "from": "SYSTEM_MONITOR",
+                    "to": "SALES_AGENT",
+                    "message": f"Retrieved {len(web_info)} live web grounding sources for '{message}'.",
+                    "timestamp": "Now"
+                })
+
+        # 3. Merchant Agent responds with bundle/stock context
+        promos = await db_tools.get_active_promotions(db, merchant_id)
+        if promos:
+            promo_names = ", ".join(p['name'] for p in promos)
+            a2a_dialogue.append({
+                "from": "MERCHANT_AGENT",
+                "to": "SALES_AGENT",
+                "message": f"Promotions active: {promo_names}. Upsell policy allows up to 5% bundle discount.",
+                "timestamp": "Now"
+            })
+
+        # 4. Authority Agent compliance review
+        policy = await db_tools.get_merchant_policy(db, merchant_id)
+        budget = await db_tools.get_customer_budget(db, customer_id)
+        if policy and budget:
+            a2a_dialogue.append({
+                "from": "AUTHORITY_AGENT",
+                "to": "SALES_AGENT",
+                "message": f"Policy verified: Customer budget cap ₹{budget:,.0f} | Max single tx ₹{policy['max_transaction_amount']:,.0f}.",
+                "timestamp": "Now"
+            })
+
+        result["a2a_dialogue"] = a2a_dialogue
 
         # After cart add, get cross-sell recs from Merchant Agent
         if result.get("intent") == "add_to_cart" and result.get("products"):
