@@ -269,30 +269,32 @@ export class OfficeScene extends Phaser.Scene {
     container.add(badge);
 
     const label = this.add.text(0, 26, name, {
-      fontFamily: 'monospace',
-      fontSize: '7px',
+      fontFamily: 'JetBrains Mono, monospace',
+      fontSize: '9px',
+      fontStyle: 'bold',
       color: '#ffffff',
     }).setOrigin(0.5);
     container.add(label);
 
     // Speech Bubble Container
-    const bubbleContainer = this.add.container(0, -38);
+    const bubbleContainer = this.add.container(0, -42);
     bubbleContainer.setVisible(false);
 
     const bubbleBg = this.add.graphics();
-    bubbleBg.fillStyle(0xffffff, 0.95);
-    bubbleBg.fillRoundedRect(-60, -18, 120, 28, 6);
-    bubbleBg.lineStyle(1, 0x334455, 1);
-    bubbleBg.strokeRoundedRect(-60, -18, 120, 28, 6);
+    bubbleBg.fillStyle(0xffffff, 0.98);
+    bubbleBg.fillRoundedRect(-75, -20, 150, 34, 6);
+    bubbleBg.lineStyle(1.5, 0x1e293b, 1);
+    bubbleBg.strokeRoundedRect(-75, -20, 150, 34, 6);
 
-    // Little pointer triangle
-    bubbleBg.fillTriangle(0, 10, -6, 16, 6, 10);
+    // Pointer triangle
+    bubbleBg.fillTriangle(0, 14, -6, 20, 6, 14);
 
     const bubbleText = this.add.text(0, -4, '', {
-      fontFamily: 'monospace',
-      fontSize: '8px',
-      color: '#111827',
-      wordWrap: { width: 110 },
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '10px',
+      fontStyle: 'bold',
+      color: '#0f172a',
+      wordWrap: { width: 135 },
       align: 'center',
     }).setOrigin(0.5);
 
