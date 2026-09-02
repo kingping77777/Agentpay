@@ -1,5 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
+:root {
+  /* Munder Difflin Canonical Design Tokens */
+  --cth-cream-50: #FFFDF5;
+  --cth-cream-100: #FFF8E7;
+  --cth-cream-200: #F4E9C7;
+  --cth-cream-300: #E8D9A0;
+  --cth-paper-100: #FCFAF0;
+  --cth-paper-200: #F0EAD2;
+
+  --cth-ink-900: #1A1320;
+  --cth-ink-700: #3D2E4A;
+  --cth-ink-500: #6B5878;
+  --cth-ink-300: #A899B5;
+  --cth-ink-100: #D9CFE0;
+
+  --cth-coral: #FF6B6B;
+  --cth-coral-light: #FFB4B4;
+  --cth-mint: #6BCF7F;
+  --cth-mint-light: #B4E5BD;
+  --cth-sky: #4ECDC4;
+  --cth-sky-light: #A8E6E0;
+  --cth-lemon: #FFD93D;
+  --cth-lemon-light: #FFEC99;
+  --cth-lilac: #B197FC;
+  --cth-lilac-light: #D6C5FF;
+  --cth-peach: #FFA07A;
+  --cth-peach-light: #FFD0B5;
+
+  --cth-wood-light: #E5C896;
+  --cth-wood-dark: #C9A66B;
+  --cth-path: #E8D8B0;
+  --cth-wall: #8B6F47;
+}
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -9,42 +43,202 @@ html, body, #root {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: #0c101d;
-  color: #f1f5f9;
-  font-family: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #1A1320;
+  color: #1A1320;
+  font-family: 'Pixelify Sans', 'Inter', -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  image-rendering: pixelated;
 }
 
-code, pre, .font-mono {
-  font-family: 'JetBrains Mono', monospace;
+/* Typography Utility Classes */
+.font-display {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0;
 }
 
-/* Custom Scrollbar for Sleek Terminal Look */
+.font-pixel {
+  font-family: 'Pixelify Sans', sans-serif;
+  letter-spacing: 0;
+}
+
+.font-vt323 {
+  font-family: 'VT323', monospace;
+  letter-spacing: 0;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'VT323', monospace;
+}
+
+/* 3-Layer SNES Beveled Panels */
+.pixel-panel {
+  background-color: var(--cth-cream-100);
+  border: 2px solid var(--cth-ink-900);
+  box-shadow: 
+    inset 0 0 0 2px var(--cth-cream-200),
+    inset 0 0 0 3px var(--cth-ink-700);
+}
+
+.pixel-panel-inset {
+  background-color: var(--cth-cream-200);
+  border: 2px solid var(--cth-ink-700);
+  box-shadow: 
+    inset 0 0 0 2px var(--cth-cream-100),
+    inset 0 0 0 3px var(--cth-ink-500);
+}
+
+.pixel-panel-active {
+  background-color: var(--cth-cream-100);
+  border: 2px solid var(--cth-ink-900);
+  box-shadow: 
+    inset 0 0 0 2px var(--cth-sky),
+    inset 0 0 0 3px var(--cth-ink-700);
+}
+
+.pixel-panel-dialog {
+  background-color: var(--cth-cream-50);
+  border: 2px solid var(--cth-ink-900);
+  box-shadow: 
+    inset 0 0 0 2px var(--cth-cream-200),
+    inset 0 0 0 3px var(--cth-ink-700);
+}
+
+.pixel-panel-terminal {
+  background-color: var(--cth-paper-100);
+  border: 2px solid var(--cth-ink-900);
+  box-shadow: 
+    inset 0 0 0 2px var(--cth-ink-700),
+    inset 0 0 0 3px var(--cth-ink-500);
+}
+
+/* Hard 4px Retro Drop Shadow */
+.pixel-shadow {
+  filter: drop-shadow(4px 4px 0 rgba(26, 19, 32, 0.35));
+}
+
+.pixel-shadow-sm {
+  filter: drop-shadow(2px 2px 0 rgba(26, 19, 32, 0.35));
+}
+
+/* 3D Chunky Push Button Styles */
+.pixel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1;
+  padding: 8px 14px;
+  border: 2px solid var(--cth-ink-900);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+  position: relative;
+}
+
+.pixel-btn-primary {
+  background-color: var(--cth-ink-900);
+  color: var(--cth-cream-50);
+  box-shadow: 
+    inset 1px 1px 0 var(--cth-ink-500),
+    inset -2px -2px 0 #000000,
+    2px 2px 0 rgba(26, 19, 32, 0.4);
+}
+
+.pixel-btn-primary:hover {
+  background-color: var(--cth-ink-700);
+}
+
+.pixel-btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 1px 1px 0 #000000;
+}
+
+.pixel-btn-secondary {
+  background-color: var(--cth-cream-100);
+  color: var(--cth-ink-900);
+  box-shadow: 
+    inset 1px 1px 0 #ffffff,
+    inset -2px -2px 0 var(--cth-cream-300),
+    2px 2px 0 rgba(26, 19, 32, 0.3);
+}
+
+.pixel-btn-secondary:hover {
+  background-color: var(--cth-cream-50);
+}
+
+.pixel-btn-secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 1px 1px 0 var(--cth-cream-300);
+}
+
+.pixel-btn-mint {
+  background-color: var(--cth-mint);
+  color: var(--cth-ink-900);
+  box-shadow: 
+    inset 1px 1px 0 var(--cth-mint-light),
+    inset -2px -2px 0 #4ba85c,
+    2px 2px 0 rgba(26, 19, 32, 0.3);
+}
+
+.pixel-btn-mint:hover {
+  background-color: var(--cth-mint-light);
+}
+
+.pixel-btn-mint:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 1px 1px 0 #4ba85c;
+}
+
+.pixel-btn-lemon {
+  background-color: var(--cth-lemon);
+  color: var(--cth-ink-900);
+  box-shadow: 
+    inset 1px 1px 0 var(--cth-lemon-light),
+    inset -2px -2px 0 #d9b422,
+    2px 2px 0 rgba(26, 19, 32, 0.3);
+}
+
+.pixel-btn-lemon:hover {
+  background-color: var(--cth-lemon-light);
+}
+
+.pixel-btn-lemon:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 1px 1px 0 #d9b422;
+}
+
+.pixel-btn-destructive {
+  background-color: var(--cth-coral);
+  color: var(--cth-cream-50);
+  box-shadow: 
+    inset 1px 1px 0 var(--cth-coral-light),
+    inset -2px -2px 0 #cc4545,
+    2px 2px 0 rgba(26, 19, 32, 0.4);
+}
+
+.pixel-btn-destructive:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 1px 1px 0 #cc4545;
+}
+
+/* Custom Pixel Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d121f;
+  background: var(--cth-cream-200);
+  border-left: 2px solid var(--cth-ink-900);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #25334d;
-  border-radius: 4px;
+  background: var(--cth-cream-300);
+  border: 2px solid var(--cth-ink-900);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #394d73;
-}
-
-/* Smooth Pulse Animation */
-@keyframes pulseGlow {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.03); }
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 2s infinite ease-in-out;
+  background: var(--cth-ink-500);
 }

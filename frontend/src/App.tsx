@@ -5,7 +5,6 @@ import { CommandCenter } from './components/CommandCenter';
 import { BottomTelemetryBar } from './components/BottomTelemetryBar';
 import { ChatMessage } from './types';
 import { getDemoIds, createSession, sendAgentChat, getSystemStatus, getAuditLogs, triggerPayment } from './services/api';
-import { voiceService } from './services/voice';
 
 export const App: React.FC = () => {
   const [sessionId, setSessionId] = useState<string>('');
@@ -108,9 +107,6 @@ export const App: React.FC = () => {
       setCurrentAgent(res.agent || 'SALES_AGENT');
       setLastMessage(res.message);
 
-      // Speak response using voice engine
-      voiceService.speak(res.message);
-
       // Refresh audit logs
       const audit = await getAuditLogs(sessionId);
       setAuditLogs(audit.audit_logs || []);
@@ -149,7 +145,6 @@ export const App: React.FC = () => {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, payMsg]);
-      voiceService.speak(`Payment of ₹${total} authorized successfully.`);
     } catch (e: any) {
       alert(`Payment error: ${e.message}`);
     }
@@ -174,14 +169,14 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col bg-[#0a0e1a] text-slate-100 overflow-hidden font-sans">
+    <div className="w-screen h-screen flex flex-col bg-[#1A1320] text-[#1A1320] overflow-hidden font-pixel">
       {/* 1. Top Header Bar */}
       <TopBar sessionId={sessionId} onMemoryReplay={handleMemoryReplay} />
 
       {/* 2. Main Middle Workspace (Split: Left Phaser 2D Office | Right React Command Center) */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-[#FFF8E7]">
         {/* Left: 2D Pixel Office Canvas */}
-        <div className="w-full lg:w-[54%] h-1/2 lg:h-full border-r border-[#1f283d] relative">
+        <div className="w-full lg:w-[54%] h-1/2 lg:h-full relative">
           <PhaserOffice currentAgent={currentAgent} lastMessage={lastMessage} />
         </div>
 
@@ -200,7 +195,7 @@ export const App: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Bottom Telemetry Bar (6 Retro-Cream Cards) */}
+      {/* 3. Bottom Telemetry Bar */}
       <BottomTelemetryBar statusData={statusData} />
     </div>
   );

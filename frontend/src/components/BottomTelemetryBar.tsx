@@ -11,129 +11,130 @@ export const BottomTelemetryBar: React.FC<BottomTelemetryBarProps> = ({ statusDa
   const cards = [
     {
       id: 'sales',
-      emoji: '👨‍💼',
-      name: 'SALES AGENT',
-      status: 'Online',
-      statusColor: 'text-[#2e7d32]',
-      ledColor: 'bg-[#2e7d32]',
-      model: 'Claude-3.5-Sonnet / Gemini',
-      focus: 'Customer Needs',
-      stat1: { label: 'Tasks', val: agents[0]?.tasks || 5, pct: Math.min(100, (agents[0]?.tasks || 5) * 12), color: 'bg-[#5c6bc0]' },
-      stat2: { label: 'Memory', val: `${agents[0]?.memory || 62}%`, pct: agents[0]?.memory || 62, color: 'bg-[#43a047]' },
+      accent: '#4ECDC4',
+      name: 'SALES (MICHAEL)',
+      status: 'ONLINE',
+      ledColor: '#6BCF7F',
+      subtext: 'Gemini / Claude',
+      stat1: { label: 'TASKS', val: agents[0]?.tasks || 5, pct: Math.min(100, (agents[0]?.tasks || 5) * 12) },
+      stat2: { label: 'MEM RECALL', val: '1.2ms', pct: 85 },
     },
     {
       id: 'merchant',
-      emoji: '👨‍💼',
+      accent: '#FFA07A',
       name: 'MERCHANT AGENT',
-      status: 'Online',
-      statusColor: 'text-[#2e7d32]',
-      ledColor: 'bg-[#2e7d32]',
-      model: 'Claude-3.5-Sonnet / Gemini',
-      focus: 'Merchant Policy',
-      stat1: { label: 'Tasks', val: agents[1]?.tasks || 4, pct: Math.min(100, (agents[1]?.tasks || 4) * 12), color: 'bg-[#42a5f5]' },
-      stat2: { label: 'Memory', val: `${agents[1]?.memory || 58}%`, pct: agents[1]?.memory || 58, color: 'bg-[#43a047]' },
+      status: 'ONLINE',
+      ledColor: '#6BCF7F',
+      subtext: 'TechStore Engine',
+      stat1: { label: 'STOCK QUEUE', val: agents[1]?.tasks || 4, pct: Math.min(100, (agents[1]?.tasks || 4) * 12) },
+      stat2: { label: 'DISCOUNTS', val: '5.0%', pct: 60 },
     },
     {
       id: 'authority',
-      emoji: '👤',
+      accent: '#B197FC',
       name: 'AUTHORITY AGENT',
-      status: 'Active',
-      statusColor: 'text-[#2e7d32]',
-      ledColor: 'bg-[#2e7d32]',
-      model: 'Claude-3.5-Sonnet / Gemini',
-      focus: 'Validation & Policy',
-      stat1: { label: 'Tasks', val: agents[2]?.tasks || 6, pct: Math.min(100, (agents[2]?.tasks || 6) * 12), color: 'bg-[#7e57c2]' },
-      stat2: { label: 'Memory', val: `${agents[2]?.memory || 71}%`, pct: agents[2]?.memory || 71, color: 'bg-[#43a047]' },
+      status: 'ACTIVE',
+      ledColor: '#4ECDC4',
+      subtext: 'Policy & Safety',
+      stat1: { label: 'BUDGET CAP', val: '₹70k', pct: 70 },
+      stat2: { label: 'CHECKS PASS', val: '100%', pct: 100 },
     },
     {
       id: 'payment',
-      emoji: '👨‍🦳',
-      name: 'PAYMENT SERVICE',
-      status: 'Online',
-      statusColor: 'text-[#2e7d32]',
-      ledColor: 'bg-[#2e7d32]',
-      model: 'Razorpay API',
-      focus: 'Transactions',
-      stat1: { label: 'Queue', val: services[0]?.queue || 1, pct: 25, color: 'bg-[#ff9800]' },
-      stat2: { label: 'Success', val: `${services[0]?.success_rate || 99}%`, pct: 99, color: 'bg-[#43a047]' },
+      accent: '#FFD93D',
+      name: 'PAYMENT GATEWAY',
+      status: 'READY',
+      ledColor: '#6BCF7F',
+      subtext: 'Razorpay Service',
+      stat1: { label: 'PENDING', val: services[0]?.queue || 0, pct: 15 },
+      stat2: { label: 'SUCCESS', val: '99.9%', pct: 99.9 },
     },
     {
       id: 'audit',
-      emoji: '👩‍💼',
-      name: 'AUDIT LOGGER',
-      status: 'Online',
-      statusColor: 'text-[#2e7d32]',
-      ledColor: 'bg-[#2e7d32]',
-      model: 'System Logger',
-      focus: 'Audit Trail',
-      stat1: { label: 'Events', val: services[1]?.events || 128, pct: 75, color: 'bg-[#1e88e5]' },
-      stat2: { label: 'Storage', val: `${services[1]?.storage || 74}%`, pct: 74, color: 'bg-[#43a047]' },
+      accent: '#FF6B6B',
+      name: 'AUDIT RECORDER',
+      status: 'LOGGING',
+      ledColor: '#FF6B6B',
+      subtext: 'Immutable Ledger',
+      stat1: { label: 'EVENTS', val: services[1]?.events || 142, pct: 80 },
+      stat2: { label: 'INTEGRITY', val: 'VERIFIED', pct: 100 },
     },
     {
       id: 'system',
-      emoji: '🤖',
-      name: 'SYSTEM MONITOR',
-      status: 'Online',
-      statusColor: 'text-[#2e7d32]',
-      ledColor: 'bg-[#2e7d32]',
-      model: 'Health Check',
-      focus: 'System Health',
-      stat1: { label: 'Uptime', val: `${services[2]?.uptime || 99.9}%`, pct: 99.9, color: 'bg-[#1e88e5]' },
-      stat2: { label: 'Load', val: `${services[2]?.load || 42}%`, pct: 42, color: 'bg-[#43a047]' },
+      accent: '#6BCF7F',
+      name: 'HIVE ENGINE',
+      status: 'ONLINE',
+      ledColor: '#6BCF7F',
+      subtext: 'Zero-Lag PTY Loop',
+      stat1: { label: 'LATENCY', val: '38ms', pct: 90 },
+      stat2: { label: 'HEARTBEAT', val: '100%', pct: 100 },
     },
   ];
 
   return (
-    <div className="h-36 bg-[#e8e2d4] border-t-2 border-[#b8b09e] grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 p-2 select-none overflow-x-auto">
+    <footer className="h-32 bg-[#FFF8E7] border-t-2 border-[#1A1320] grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 p-2 select-none overflow-x-auto shadow-[inset_0_2px_0_#F4E9C7]">
       {cards.map((card) => (
         <div
           key={card.id}
-          className="bg-[#f4efe4] rounded border border-[#cfc7b4] shadow-sm p-2 flex flex-col justify-between"
+          className="bg-[#FFFDF5] border-2 border-[#1A1320] p-2 flex flex-col justify-between shadow-[2px_2px_0_rgba(26,19,32,0.2)] hover:bg-[#FFF8E7] transition-all"
         >
-          {/* Header */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded bg-[#e2dac9] border border-[#c4baa3] flex items-center justify-center text-lg flex-shrink-0">
-              {card.emoji}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-slate-800 font-mono truncate">{card.name}</span>
-                <span className="flex items-center gap-1 text-[8px] font-mono font-bold text-[#2e7d32]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#2e7d32]" />
-                  {card.status}
+          {/* Card Header */}
+          <div>
+            <div className="flex items-center justify-between pb-1 border-b border-[#F4E9C7]">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span
+                  className="w-2 h-2 border border-[#1A1320] shrink-0"
+                  style={{ backgroundColor: card.accent }}
+                />
+                <span className="font-display text-[8px] text-[#1A1320] truncate font-bold">
+                  {card.name}
                 </span>
               </div>
-              <div className="text-[8px] text-slate-500 font-mono truncate">{card.model}</div>
-              <div className="text-[8px] text-slate-600 font-mono truncate">Focus: {card.focus}</div>
+              <span className="flex items-center gap-1 font-display text-[7px] text-[#1A1320] shrink-0">
+                <span
+                  className="w-1.5 h-1.5 border border-[#1A1320]"
+                  style={{ backgroundColor: card.ledColor }}
+                />
+                {card.status}
+              </span>
+            </div>
+            <div className="font-display text-[7px] text-[#6B5878] mt-0.5 truncate">
+              {card.subtext}
             </div>
           </div>
 
-          {/* Metrics */}
-          <div className="space-y-1.5 mt-1 text-[9px] font-mono">
+          {/* Metric Bars */}
+          <div className="space-y-1 mt-1 font-vt323 text-[14px]">
             {/* Metric 1 */}
             <div>
-              <div className="flex justify-between text-slate-700 font-semibold mb-0.5">
-                <span>{card.stat1.label}</span>
-                <span>{card.stat1.val}</span>
+              <div className="flex justify-between text-[#1A1320] leading-none mb-0.5">
+                <span className="font-display text-[7px] text-[#6B5878]">{card.stat1.label}</span>
+                <span className="font-bold">{card.stat1.val}</span>
               </div>
-              <div className="w-full h-1.5 bg-[#dcd4c0] rounded-sm overflow-hidden">
-                <div className={`h-full ${card.stat1.color} rounded-sm`} style={{ width: `${card.stat1.pct}%` }} />
+              <div className="w-full h-1.5 bg-[#F4E9C7] border border-[#1A1320] overflow-hidden">
+                <div
+                  className="h-full"
+                  style={{ width: `${card.stat1.pct}%`, backgroundColor: card.accent }}
+                />
               </div>
             </div>
 
             {/* Metric 2 */}
             <div>
-              <div className="flex justify-between text-slate-700 font-semibold mb-0.5">
-                <span>{card.stat2.label}</span>
-                <span>{card.stat2.val}</span>
+              <div className="flex justify-between text-[#1A1320] leading-none mb-0.5">
+                <span className="font-display text-[7px] text-[#6B5878]">{card.stat2.label}</span>
+                <span className="font-bold">{card.stat2.val}</span>
               </div>
-              <div className="w-full h-1.5 bg-[#dcd4c0] rounded-sm overflow-hidden">
-                <div className={`h-full ${card.stat2.color} rounded-sm`} style={{ width: `${card.stat2.pct}%` }} />
+              <div className="w-full h-1.5 bg-[#F4E9C7] border border-[#1A1320] overflow-hidden">
+                <div
+                  className="h-full bg-[#6BCF7F]"
+                  style={{ width: `${card.stat2.pct}%` }}
+                />
               </div>
             </div>
           </div>
         </div>
       ))}
-    </div>
+    </footer>
   );
 };
