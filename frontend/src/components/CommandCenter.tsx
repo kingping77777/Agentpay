@@ -27,6 +27,7 @@ interface CommandCenterProps {
   onAddToCart: (productName: string) => void;
   onProceedToCheckout: () => void;
   onTriggerPayment: (orderId: string, total: number) => void;
+  onDirectBuy?: (product: Product) => void;
   auditLogs: any[];
 }
 
@@ -38,6 +39,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   onAddToCart,
   onProceedToCheckout,
   onTriggerPayment,
+  onDirectBuy,
   auditLogs,
 }) => {
   const [activeTab, setActiveTab] = useState<string>('Dialogue');
@@ -256,36 +258,53 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                                   <Package className="w-4 h-4 text-[#4ECDC4] shrink-0" />
                                 </div>
                                 <div className="font-display text-[8px] text-[#6B5878] mt-1">
-                                  {p.brand.toUpperCase()}
+                                  {p.brand.toUpperCase()} • {p.category.toUpperCase()}
                                 </div>
+                                {p.description && (
+                                  <p className="font-pixel text-[12px] text-[#6B5878] line-clamp-2 mt-1">
+                                    {p.description}
+                                  </p>
+                                )}
                               </div>
 
-                              <div className="mt-3 pt-2 border-t-2 border-[#1A1320] flex items-center justify-between gap-2">
-                                <div>
-                                  <span className="font-display text-[11px] text-[#1A1320] font-bold">
-                                    ₹{p.price.toLocaleString('en-IN')}
-                                  </span>
+                              <div className="mt-3 pt-2 border-t-2 border-[#1A1320] flex items-center justify-between gap-1.5 flex-wrap">
+                                <span className="font-display text-[12px] text-[#008844] font-bold">
+                                  ₹{p.price.toLocaleString('en-IN')}
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  <PixelButton
+                                    variant="mint"
+                                    size="sm"
+                                    onClick={() => onAddToCart(p.name)}
+                                    title="Add this product to your ongoing shopping cart"
+                                  >
+                                    🛒 ADD
+                                  </PixelButton>
+                                  {onDirectBuy && (
+                                    <PixelButton
+                                      variant="lemon"
+                                      size="sm"
+                                      onClick={() => onDirectBuy(p)}
+                                      title="Direct 1-click checkout with Delivery Address & UPI QR code"
+                                    >
+                                      ⚡ BUY DIRECT
+                                    </PixelButton>
+                                  )}
                                 </div>
-                                <PixelButton
-                                  variant="mint"
-                                  size="sm"
-                                  onClick={() => onAddToCart(p.name)}
-                                >
-                                  ADD TO CART
-                                </PixelButton>
                               </div>
                             </div>
                           ))}
                         </div>
                       )}
 
-                      {/* Deterministic Safety / Budget Checks */}
-                      {msg.validation && (
-                        <div className="mt-3 p-2.5 bg-[#FFFDF5] border-2 border-[#1A1320] space-y-1.5">
-                          <div className="font-display text-[8px] text-[#1A1320]">
-                            DETERMINISTIC SAFETY & POLICY CHECKS
+                      {/* Deterministic Policy Check Badges */}
+                      {msg.policy_checks && msg.policy_checks.length > 0 && (
+                        <div className="mt-3 p-2 bg-[#FFFDF5] border-2 border-[#1A1320] space-y-1.5">
+                          <div className="flex items-center gap-1.5 font-display text-[8px] text-[#1A1320]">
+                            <ShieldCheck className="w-3.5 h-3.5 text-[#51CF66]" />
+                            <span>DETERMINISTIC COMPLIANCE AUDIT</span>
                           </div>
-                          {msg.validation.checks.map((c, i) => (
+                          {msg.policy_checks.map((c, i) => (
                             <div
                               key={i}
                               className={`flex items-center justify-between p-1.5 border font-display text-[8px] ${
@@ -337,14 +356,28 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         {activeTab === 'Prompt' && (
           <div className="space-y-3 font-vt323 text-[17px] text-[#1A1320]">
             <div className="p-3 bg-[#FFFDF5] border-2 border-[#1A1320] shadow-[inset_0_0_0_2px_#F4E9C7]">
-              <div className="font-display text-[9px] text-[#1A1320] mb-1">ACTIVE LLM ENGINE</div>
-              <div>Google Gemini 1.5 Flash (Deterministic Multi-Agent Loop)</div>
-            </div>
-            <div className="p-3 bg-[#FFFDF5] border-2 border-[#1A1320] shadow-[inset_0_0_0_2px_#F4E9C7]">
-              <div className="font-display text-[9px] text-[#1A1320] mb-1">SYSTEM INSTRUCTIONS</div>
-              <p className="leading-relaxed text-[#3D2E4A]">
-                You are Michael, the Sales Agent in Munder Difflin. Coordinate with TechStore for bundles and Authority Agent for zero-hallucination policy enforcement.
+              <div className="flex items-center gap-1.5 font-display text-[9px] text-[#1A1320] mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-[#FFD93D]" />
+                <span>WHAT IS THE PROMPT FEATURE?</span>
+              </div>
+              <p className="text-[15px] leading-snug text-[#3D2E4A]">
+                The <strong>Prompt</strong> tab inspects the underlying AI reasoning instructions that guide our multi-agent network. In autonomous commerce, system prompts establish persona boundaries, ensure deterministic safety compliance (e.g. strict budget adherence and zero-hallucination policies), and coordinate inter-agent negotiation protocols between Sales, Merchant, and Authority gatekeepers.
               </p>
+            </div>
+
+            <div className="p-3 bg-[#FFFDF5] border-2 border-[#1A1320] shadow-[inset_0_0_0_2px_#F4E9C7]">
+              <div className="font-display text-[9px] text-[#1A1320] mb-1">ACTIVE MULTI-AGENT INSTRUCTIONS</div>
+              <div className="space-y-2 text-[14px]">
+                <div className="p-2 bg-[#FCFAF0] border border-[#1A1320]">
+                  <strong className="text-[#FF6B6B]">🎯 Michael (Sales Discovery):</strong> Universal query parsing, multi-category feature synthesis (phones, shoes, clothes, tech), and authentic INR pricing within customer budget.
+                </div>
+                <div className="p-2 bg-[#FCFAF0] border border-[#1A1320]">
+                  <strong className="text-[#4ECDC4]">🏪 TechStore (Merchant Agent):</strong> Real-time stock verification, invoice calculation, and automated bundle discounts (up to 5%).
+                </div>
+                <div className="p-2 bg-[#FCFAF0] border border-[#1A1320]">
+                  <strong className="text-[#51CF66]">🛡️ Authority Gatekeeper:</strong> 5-step deterministic compliance audit (₹100k cap, budget validation, MFA, and discount ceiling).
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -365,25 +398,79 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 
         {/* Tab 4: Memory / Audit Logs */}
         {activeTab === 'Memory' && (
-          <div className="space-y-2 font-vt323 text-[16px] text-[#1A1320]">
-            {auditLogs.length === 0 ? (
-              <div className="text-center py-8 font-display text-[9px] text-[#6B5878]">
-                No memory audit records yet.
-              </div>
-            ) : (
-              auditLogs.map((log: any, i: number) => (
-                <div
-                  key={i}
-                  className="p-2 bg-[#FFFDF5] border-2 border-[#1A1320] flex items-center justify-between"
-                >
-                  <span>
-                    {log.decision === 'APPROVED' ? '✅' : log.decision === 'REJECTED' ? '❌' : 'ℹ️'} [{log.actor}] {log.action}
-                  </span>
-                  <span className="font-display text-[8px] text-[#6B5878]">
-                    {log.created_at?.slice(11, 19)}
+          <div className="space-y-3">
+            {/* Header */}
+            <div className="p-2.5 bg-[#FFF8E7] border-2 border-[#1A1320] shadow-[inset_0_0_0_2px_#F4E9C7]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <History className="w-4 h-4 text-[#FF6B6B]" />
+                  <span className="font-display text-[10px] text-[#1A1320] font-bold">
+                    AGENTPAY AUDIT TRAIL
                   </span>
                 </div>
-              ))
+                <span className="font-display text-[8px] text-[#6B5878] bg-[#F4E9C7] px-2 py-0.5 border border-[#1A1320]">
+                  {auditLogs.length} EVENTS
+                </span>
+              </div>
+              <p className="font-pixel text-[12px] text-[#6B5878] mt-1">
+                Immutable record of every agent action, policy check, and payment authorization.
+              </p>
+            </div>
+
+            {/* Log Entries */}
+            {auditLogs.length === 0 ? (
+              <div className="text-center py-10 space-y-2">
+                <Activity className="w-8 h-8 text-[#A899B5] mx-auto" />
+                <p className="font-display text-[9px] text-[#6B5878]">
+                  No audit events recorded yet. Start chatting to generate activity.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {auditLogs.map((log: any, i: number) => {
+                  const isApproved = log.decision === 'APPROVED';
+                  const isRejected = log.decision === 'REJECTED';
+                  const icon = isApproved ? '✅' : isRejected ? '❌' : 'ℹ️';
+                  const bgColor = isApproved
+                    ? 'bg-[#E8F8EA] border-[#6BCF7F]'
+                    : isRejected
+                    ? 'bg-[#FFE8E8] border-[#FF6B6B]'
+                    : 'bg-[#FFFDF5] border-[#1A1320]';
+
+                  const actorLabel = (log.actor || 'SYSTEM')
+                    .replace('_AGENT', '')
+                    .replace('SALES', 'MICHAEL')
+                    .replace('MERCHANT', 'TECHSTORE')
+                    .replace('AUTHORITY', 'GATEKEEPER');
+
+                  return (
+                    <div
+                      key={i}
+                      className={`p-2.5 border-2 ${bgColor} shadow-[1px_1px_0_rgba(26,19,32,0.1)]`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[13px]">{icon}</span>
+                          <span className="font-display text-[9px] text-[#1A1320] font-bold">
+                            {actorLabel}
+                          </span>
+                          <span className="font-display text-[7px] text-[#6B5878] bg-[#F4E9C7] px-1.5 py-0.5 border border-[#D9CFE0]">
+                            {(log.action || 'ACTION').replace(/_/g, ' ')}
+                          </span>
+                        </div>
+                        <span className="font-mono text-[8px] text-[#A899B5]">
+                          {log.created_at?.slice(11, 19) || '--:--:--'}
+                        </span>
+                      </div>
+                      {log.reason && (
+                        <p className="font-pixel text-[12px] text-[#3D2E4A] line-clamp-2 pl-5">
+                          {log.reason}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}
@@ -455,7 +542,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask Michael anything (e.g. Sony WH-1000XM5, RTX 4070, laptops under 70k, phones)..."
+              placeholder="Try: phone under 14k, laptop, headphones, shoes, smartwatch, backpack..."
               className="w-full px-2.5 py-2 bg-transparent text-[#1A1320] font-pixel text-[15px] placeholder:text-[#A899B5] focus:outline-none"
             />
           </div>

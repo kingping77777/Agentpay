@@ -3,7 +3,8 @@ import { TopBar } from './components/TopBar';
 import { PhaserOffice } from './components/PhaserOffice';
 import { CommandCenter } from './components/CommandCenter';
 import { BottomTelemetryBar } from './components/BottomTelemetryBar';
-import { ChatMessage } from './types';
+import { DirectCheckoutModal } from './components/DirectCheckoutModal';
+import { ChatMessage, Product } from './types';
 import { getDemoIds, createSession, sendAgentChat, getSystemStatus, getAuditLogs, triggerPayment } from './services/api';
 
 export const App: React.FC = () => {
@@ -16,6 +17,10 @@ export const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [statusData, setStatusData] = useState<any>(null);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
+
+  // Direct 1-Click Checkout Modal state
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isDirectCheckoutOpen, setIsDirectCheckoutOpen] = useState<boolean>(false);
 
   // 1. Initial Session Setup
   useEffect(() => {
@@ -32,7 +37,7 @@ export const App: React.FC = () => {
           const welcomeMsg: ChatMessage = {
             id: 'init-1',
             sender: 'SALES_AGENT',
-            text: `👋 Hello! I am Michael, your Sales Discovery Agent.\n\nI can help you search tech products across our catalog and the live web, check inventory, coordinate bundle discounts with TechStore, and verify budget limits. What are you looking for today?`,
+            text: `👋 Hello! I'm **Michael**, your AI Shopping Agent at AgentPay!\n\nI can help you find products across **any category** — just tell me what you need:\n\n📱 **Smartphones** — "phone under 14k", "best 5G phone"\n💻 **Laptops** — "laptop under 45k", "gaming laptop"\n🎧 **Audio** — "headphones under 5k", "Sony WH-1000XM5"\n⌚ **Watches** — "smartwatch under 2k"\n👟 **Shoes** — "running shoes under 3k"\n👕 **Fashion** — "jacket", "hoodie"\n💪 **Fitness** — "whey protein"\n🏠 **Home & Kitchen** — "coffee maker"\n🎒 **Bags** — "laptop backpack"\n\n...and much more! I'll find the best options with real specs, prices in ₹, and you can add to cart or buy directly.\n\nWhat are you looking for today? 🛍️`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           };
           setMessages([welcomeMsg]);
@@ -135,6 +140,27 @@ export const App: React.FC = () => {
     handleSendMessage('Proceed to checkout');
   };
 
+  const handleDirectBuy = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDirectCheckoutOpen(true);
+  };
+
+  const handleDirectPaymentSuccess = async (orderInfo: any) => {
+    const paySuccessMsg: ChatMessage = {
+      id: `dir-pay-${Date.now()}`,
+      sender: 'PAYMENT_SERVICE',
+      text: `🎉 **Direct UPI Payment Authorized & Order Confirmed!**\n\n• **Item:** ${orderInfo.product_name}\n• **Total Paid:** ₹${Number(orderInfo.total).toLocaleString('en-IN')}\n• **Transaction ID:** \`${orderInfo.payment_id}\`\n• **Shipping Destination:** ${orderInfo.delivery_address}\n\nYour order has been sent to TechStore regional distribution center for priority 2-day dispatch!`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    setMessages((prev) => [...prev, paySuccessMsg]);
+    setCurrentAgent('AUTHORITY_AGENT');
+    setLastMessage(`Payment of ₹${orderInfo.total} verified successfully!`);
+
+    // Refresh telemetry
+    const status = await getSystemStatus();
+    setStatusData(status);
+  };
+
   const handleTriggerPayment = async (orderId: string, total: number) => {
     try {
       const res = await triggerPayment(orderId);
@@ -190,6 +216,7 @@ export const App: React.FC = () => {
             onAddToCart={handleAddToCart}
             onProceedToCheckout={handleProceedToCheckout}
             onTriggerPayment={handleTriggerPayment}
+            onDirectBuy={handleDirectBuy}
             auditLogs={auditLogs}
           />
         </div>
@@ -197,6 +224,19 @@ export const App: React.FC = () => {
 
       {/* 3. Bottom Telemetry Bar */}
       <BottomTelemetryBar statusData={statusData} />
+
+      {/* 4. Direct 1-Click Checkout Modal with UPI QR Code */}
+      <DirectCheckoutModal
+        product={selectedProduct}
+        customerId={customerId}
+        merchantId={merchantId}
+        isOpen={isDirectCheckoutOpen}
+        onClose={() => {
+          setIsDirectCheckoutOpen(false);
+          setSelectedProduct(null);
+        }}
+        onPaymentSuccess={handleDirectPaymentSuccess}
+      />
     </div>
   );
 };

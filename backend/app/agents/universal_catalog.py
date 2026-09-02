@@ -352,7 +352,246 @@ CATALOG_KNOWLEDGE: dict[str, dict[str, Any]] = {
                 ]
             }
         ]
-    }
+    },
+
+    # ── Headphones & Audio ───────────────────────────────────────────────────
+    "headphone": {
+        "category": "audio",
+        "brand_pool": ["Sony", "JBL", "boAt", "Sennheiser", "Bose", "Apple"],
+        "tiers": [
+            {
+                "max_budget": 5000,
+                "items": [
+                    {
+                        "name": "boAt Rockerz 551ANC Wireless Headphones",
+                        "brand": "boat",
+                        "price": 2499.00,
+                        "description": "Active Noise Cancelling wireless headphones with 40mm Dirac Opteo drivers, 100H playtime, Ambient Mode, and ASAP charge.",
+                        "specifications": {
+                            "driver": "40mm Dirac Opteo™ Tuned Drivers",
+                            "anc": "Hybrid Active Noise Cancellation (-25dB)",
+                            "battery": "100 Hours (ANC Off) / 72 Hours (ANC On)",
+                            "connectivity": "Bluetooth 5.3 with Dual Pairing",
+                        }
+                    },
+                    {
+                        "name": "JBL Tune 770NC Wireless Headphones",
+                        "brand": "jbl",
+                        "price": 4699.00,
+                        "description": "Legendary JBL Pure Bass Sound with Adaptive ANC, 70H battery, Ambient Aware and TalkThru, foldable flat-fold design.",
+                        "specifications": {
+                            "driver": "40mm JBL Pure Bass Drivers",
+                            "anc": "Adaptive Active Noise Cancelling",
+                            "battery": "70 Hours with ANC / 44 Hours with ANC On",
+                            "connectivity": "Bluetooth 5.3, multipoint connection, Google Fast Pair",
+                        }
+                    }
+                ]
+            },
+            {
+                "max_budget": 30000,
+                "items": [
+                    {
+                        "name": "Sony WH-1000XM5 Premium Wireless ANC Headphones",
+                        "brand": "sony",
+                        "price": 26990.00,
+                        "description": "Industry-leading noise cancellation with 8 microphones, Auto NC Optimizer, 30H battery, Hi-Res Audio, and crystal-clear hands-free calling.",
+                        "specifications": {
+                            "driver": "30mm specially designed carbon fiber composite drivers",
+                            "anc": "Dual Processor noise cancelling with 8 microphones",
+                            "battery": "30 Hours with ANC / 3 min charge = 3 hours",
+                            "audio_codec": "LDAC, SBC, AAC (Hi-Res Audio Wireless)",
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+
+    # ── Laptops & Ultrabooks ─────────────────────────────────────────────────
+    "laptop": {
+        "category": "laptops",
+        "brand_pool": ["HP", "Lenovo", "ASUS", "Dell", "Acer", "Apple"],
+        "tiers": [
+            {
+                "max_budget": 45000,
+                "items": [
+                    {
+                        "name": "Acer Aspire Lite AL15-52 (i5, 16GB, 512GB SSD)",
+                        "brand": "acer",
+                        "price": 37990.00,
+                        "description": "Powerful everyday laptop with 12th Gen Intel Core i5-1235U, 16GB DDR4 RAM, 512GB NVMe SSD, and 15.6-inch FHD IPS display.",
+                        "specifications": {
+                            "processor": "Intel Core i5-1235U (12th Gen, 10-core)",
+                            "memory": "16GB DDR4 3200MHz (Upgradeable)",
+                            "storage": "512GB PCIe NVMe SSD",
+                            "display": "15.6-inch FHD IPS (1920×1080, 300 nits)",
+                            "battery": "Up to 11 Hours battery life",
+                        }
+                    },
+                    {
+                        "name": "Lenovo IdeaPad Slim 3 (Ryzen 5, 8GB, 512GB)",
+                        "brand": "lenovo",
+                        "price": 34990.00,
+                        "description": "Sleek and lightweight laptop with AMD Ryzen 5 7520U, 8GB LPDDR5, 512GB SSD, and 15.6-inch FHD anti-glare display.",
+                        "specifications": {
+                            "processor": "AMD Ryzen 5 7520U (Zen 2, 4-core)",
+                            "memory": "8GB LPDDR5 4800MHz",
+                            "storage": "512GB PCIe Gen 4 NVMe SSD",
+                            "display": "15.6-inch FHD Anti-Glare (250 nits)",
+                            "weight": "1.62 kg ultra-portable",
+                        }
+                    }
+                ]
+            },
+            {
+                "max_budget": 80000,
+                "items": [
+                    {
+                        "name": "ASUS Vivobook S 15 OLED (i7, 16GB, 1TB SSD)",
+                        "brand": "asus",
+                        "price": 74990.00,
+                        "description": "Stunning 15.6-inch 2.8K 120Hz OLED display, Intel Core i7-13700H (13th Gen), 16GB DDR5, 1TB SSD, Intel Iris Xe.",
+                        "specifications": {
+                            "processor": "Intel Core i7-13700H (14-core, 5.0GHz turbo)",
+                            "memory": "16GB DDR5 4800MHz",
+                            "storage": "1TB PCIe Gen 4 NVMe SSD",
+                            "display": "15.6-inch 2.8K OLED 120Hz (600 nits, DCI-P3 100%)",
+                            "weight": "1.7 kg, Thunderbolt 4, HARMAN speakers",
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+
+    # ── Smartwatches & Fitness Trackers ───────────────────────────────────────
+    "watch": {
+        "category": "wearables",
+        "brand_pool": ["Noise", "Fire-Boltt", "boAt", "Samsung", "Apple"],
+        "tiers": [
+            {
+                "max_budget": 5000,
+                "items": [
+                    {
+                        "name": "Noise ColorFit Pulse 3 Smartwatch",
+                        "brand": "noise",
+                        "price": 1499.00,
+                        "description": "1.96-inch TFT Vivid Display, BT Calling, 150+ watch faces, SpO2 monitoring, and 7-day battery life.",
+                        "specifications": {
+                            "display": "1.96-inch TFT HD Vivid Display (240×282px)",
+                            "calling": "Bluetooth Calling with built-in mic & speaker",
+                            "health": "24/7 Heart Rate, SpO2, Sleep Tracking",
+                            "battery": "7-Day Battery Life / 200mAh",
+                        }
+                    },
+                    {
+                        "name": "Fire-Boltt Phoenix Ultra Smartwatch",
+                        "brand": "fire-boltt",
+                        "price": 1799.00,
+                        "description": "1.39-inch AMOLED Always-On Display, Bluetooth Calling, IP68 water resistance, 120+ sports modes.",
+                        "specifications": {
+                            "display": "1.39-inch AMOLED AOD (360×360px, 500 nits)",
+                            "health": "Heart Rate, SpO2, Blood Pressure monitor",
+                            "sports": "120+ Sports Modes with GPS Connected",
+                            "battery": "10-Day Battery / 280mAh",
+                        }
+                    }
+                ]
+            },
+            {
+                "max_budget": 30000,
+                "items": [
+                    {
+                        "name": "Samsung Galaxy Watch6 (44mm, Bluetooth)",
+                        "brand": "samsung",
+                        "price": 22999.00,
+                        "description": "Premium Wear OS smartwatch with BioActive sensor, Sapphire Crystal display, advanced sleep coaching, and Galaxy AI features.",
+                        "specifications": {
+                            "display": "1.5-inch Super AMOLED (480×480px, Sapphire Crystal)",
+                            "sensor": "Samsung BioActive Sensor (HR, SpO2, Bioelectrical Impedance)",
+                            "battery": "425mAh with fast wireless charging",
+                            "os": "Wear OS 4.0 powered by Samsung with Google Play",
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+
+    # ── Bags & Backpacks ─────────────────────────────────────────────────────
+    "bag": {
+        "category": "bags",
+        "brand_pool": ["Safari", "Skybags", "American Tourister", "Wildcraft", "Aristocrat"],
+        "tiers": [
+            {
+                "max_budget": 5000,
+                "items": [
+                    {
+                        "name": "American Tourister Valex 28L Laptop Backpack",
+                        "brand": "american tourister",
+                        "price": 1399.00,
+                        "description": "28-Litre durable backpack with dedicated 15.6-inch laptop compartment, organizer pockets, and padded shoulder straps.",
+                        "specifications": {
+                            "capacity": "28 Litres with multi-section organization",
+                            "laptop_compartment": "Fits up to 15.6-inch laptops",
+                            "material": "Water-Resistant Polyester Fabric",
+                            "warranty": "3 Year International Brand Warranty",
+                        }
+                    },
+                    {
+                        "name": "Wildcraft 44L Hiking \u0026 Travel Rucksack",
+                        "brand": "wildcraft",
+                        "price": 2999.00,
+                        "description": "Rugged 44L adventure rucksack with rain cover, hip belt suspension, hydration sleeve, and ripstop nylon construction.",
+                        "specifications": {
+                            "capacity": "44 Litres with expandable top lid",
+                            "material": "High Denier Ripstop Nylon with PU coating",
+                            "features": "Rain Cover, Hip Belt, Hydration Sleeve",
+                            "back_system": "Padded contoured back panel with ventilation channels",
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+
+    # ── Speakers & Portable Audio ────────────────────────────────────────────
+    "speaker": {
+        "category": "audio",
+        "brand_pool": ["JBL", "boAt", "Sony", "Marshall", "Ultimate Ears"],
+        "tiers": [
+            {
+                "max_budget": 10000,
+                "items": [
+                    {
+                        "name": "JBL Flip 6 Portable Bluetooth Speaker",
+                        "brand": "jbl",
+                        "price": 8999.00,
+                        "description": "Powerful JBL Original Pro Sound with IP67 waterproof dustproof rating, 12H playtime, and PartyBoost multi-speaker pairing.",
+                        "specifications": {
+                            "driver": "Dual passive radiators + racetrack woofer",
+                            "battery": "12 Hours playtime / 4800mAh",
+                            "waterproof": "IP67 Waterproof and Dustproof",
+                            "connectivity": "Bluetooth 5.1, PartyBoost",
+                        }
+                    },
+                    {
+                        "name": "boAt Stone 1208 Bluetooth Speaker",
+                        "brand": "boat",
+                        "price": 1999.00,
+                        "description": "14W HD immersive sound with passive bass radiator, IPX7 water resistance, 9H battery, and RGB LED lights.",
+                        "specifications": {
+                            "output": "14W HD stereo sound with passive bass radiator",
+                            "battery": "9 Hours playtime / 2500mAh",
+                            "waterproof": "IPX7 water resistance",
+                            "features": "RGB LED lights, TWS pairing, AUX/microSD/BT",
+                        }
+                    }
+                ]
+            }
+        ]
+    },
 }
 
 
@@ -368,18 +607,36 @@ def synthesize_products_for_query(raw_query: str) -> list[dict]:
 
     # 1. Match against known knowledge domains
     matched_domain = None
-    if any(w in lower_keyword for w in ["phone", "mobile", "smartphone", "android", "iphone"]):
+    if any(w in lower_keyword for w in ["phone", "mobile", "smartphone", "android", "iphone", "5g phone", "samsung", "redmi", "oneplus", "poco", "realme", "vivo", "oppo", "iqoo"]):
         matched_domain = "phone"
-    elif any(w in lower_keyword for w in ["shoe", "sneaker", "running", "footwear", "boot", "sandal"]):
+    elif any(w in lower_keyword for w in ["shoe", "sneaker", "running", "footwear", "boot", "sandal", "slipper", "jogger", "training shoe", "nike", "adidas", "puma"]):
         matched_domain = "shoe"
-    elif any(w in lower_keyword for w in ["jacket", "hoodie", "shirt", "tshirt", "jeans", "coat", "clothing"]):
+    elif any(w in lower_keyword for w in ["jacket", "hoodie", "shirt", "tshirt", "t-shirt", "jeans", "coat", "clothing", "sweatshirt", "kurta", "trouser", "pant", "dress", "blazer", "sweater"]):
         matched_domain = "jacket"
-    elif any(w in lower_keyword for w in ["protein", "creatine", "supplement", "whey", "gym", "bcaa"]):
+    elif any(w in lower_keyword for w in ["protein", "creatine", "supplement", "whey", "gym", "bcaa", "pre-workout", "preworkout", "mass gainer", "vitamins"]):
         matched_domain = "protein"
-    elif any(w in lower_keyword for w in ["coffee", "espresso", "maker", "kettle", "fryer", "blender", "kitchen"]):
+    elif any(w in lower_keyword for w in ["coffee", "espresso", "maker", "kettle", "fryer", "blender", "kitchen", "mixer", "grinder", "oven", "microwave", "toaster", "juicer", "cooker", "pressure cooker"]):
         matched_domain = "coffee"
-    elif any(w in lower_keyword for w in ["chair", "desk", "furniture", "table", "ergonomic"]):
+    elif any(w in lower_keyword for w in ["chair", "desk", "furniture", "table", "ergonomic", "standing desk", "bookshelf", "sofa", "bed", "mattress"]):
         matched_domain = "chair"
+    elif any(w in lower_keyword for w in ["headphone", "earphone", "earbud", "earbuds", "headset", "tws", "bluetooth earbuds", "neckband", "airpod", "sony wh", "jbl"]):
+        matched_domain = "headphone"
+    elif any(w in lower_keyword for w in ["laptop", "notebook", "ultrabook", "macbook", "chromebook", "thinkpad", "ideapad", "gaming laptop"]):
+        matched_domain = "laptop"
+    elif any(w in lower_keyword for w in ["watch", "smartwatch", "wristwatch", "apple watch", "fitness band", "tracker", "fitbit", "noise watch"]):
+        matched_domain = "watch"
+    elif any(w in lower_keyword for w in ["tablet", "ipad", "tab", "drawing pad", "kindle", "e-reader"]):
+        matched_domain = "tablet"
+    elif any(w in lower_keyword for w in ["bag", "backpack", "luggage", "suitcase", "travel bag", "duffel", "laptop bag", "handbag", "tote"]):
+        matched_domain = "bag"
+    elif any(w in lower_keyword for w in ["camera", "dslr", "mirrorless", "gopro", "action camera", "webcam", "tripod"]):
+        matched_domain = "camera"
+    elif any(w in lower_keyword for w in ["speaker", "bluetooth speaker", "soundbar", "subwoofer", "home theater", "portable speaker"]):
+        matched_domain = "speaker"
+    elif any(w in lower_keyword for w in ["monitor", "gaming monitor", "curved monitor", "display", "4k monitor"]):
+        matched_domain = "monitor"
+    elif any(w in lower_keyword for w in ["keyboard", "mouse", "gaming keyboard", "mechanical keyboard", "wireless mouse", "mousepad"]):
+        matched_domain = "keyboard"
 
     if matched_domain and matched_domain in CATALOG_KNOWLEDGE:
         domain_info = CATALOG_KNOWLEDGE[matched_domain]
@@ -405,22 +662,52 @@ def synthesize_products_for_query(raw_query: str) -> list[dict]:
         if matching_products:
             return matching_products[:4]
 
-    # 2. Universal Dynamic Fallback Generator for any arbitrary product term!
-    # (e.g., "smart sunglasses", "mechanical watch", "dyson vacuum", "wireless earbuds", "camping tent")
+    # 2. Universal Smart Fallback Generator for any arbitrary product term
+    # Provides intelligent branded alternatives even for products not in the knowledge base
     target_name = clean_keyword.title() if clean_keyword else "Premium Tech Item"
     target_cat = "consumer_goods"
 
+    # Smart category inference from context
+    cat_map = {
+        "electronics": ["charger", "cable", "adapter", "power bank", "usb", "hub", "dongle"],
+        "gaming": ["controller", "gamepad", "console", "joystick", "vr"],
+        "beauty": ["perfume", "cream", "serum", "moisturizer", "sunscreen", "shampoo", "conditioner"],
+        "stationery": ["pen", "pencil", "notebook", "diary", "planner", "marker"],
+        "toys": ["toy", "lego", "puzzle", "board game", "action figure"],
+        "automotive": ["car", "bike", "helmet", "dash cam", "gps"],
+        "sports": ["bat", "ball", "racket", "gloves", "jersey", "shin guard"],
+        "books": ["book", "novel", "manga", "textbook", "guide"],
+    }
+    for cat, keywords in cat_map.items():
+        if any(kw in lower_keyword for kw in keywords):
+            target_cat = cat
+            break
+
+    # Realistic brand pools by inferred category
+    brand_pools = {
+        "electronics": ["Anker", "Belkin", "Baseus", "Portronics"],
+        "gaming": ["Cosmic Byte", "Redgear", "HyperX", "Ant Esports"],
+        "beauty": ["Mamaearth", "The Body Shop", "L'Oreal", "Nivea"],
+        "stationery": ["Parker", "Faber-Castell", "Classmate", "Cello"],
+        "toys": ["Lego", "Funskool", "Mattel", "Hasbro"],
+        "automotive": ["Bosch", "Mivi", "Qubo", "70Mai"],
+        "sports": ["Nivia", "Yonex", "Cosco", "SG"],
+        "books": ["Penguin", "HarperCollins", "Rupa", "Scholastic"],
+        "consumer_goods": ["ApexTech", "NovaGear", "ProElite", "UrbanLux"],
+    }
+    brands = brand_pools.get(target_cat, brand_pools["consumer_goods"])
+
     # Estimate price from user budget
     if user_budget > 0:
-        base_price = round(user_budget * 0.92, -1) # e.g. if 14000 -> 12880
+        base_price = round(user_budget * 0.92, -1)
     else:
         base_price = 2499.00
 
-    # Build 2 varied branded models
+    # Build 3 varied branded models
     model_variants = [
-        (f"Pro {target_name} (Series X)", "ApexTech", base_price, 4.8),
-        (f"Ultra Comfort {target_name} Edition", "NovaGear", round(base_price * 0.85, -1), 4.7),
-        (f"Classic {target_name} (Official Warranty)", "OmniBrand", round(base_price * 0.78, -1), 4.6),
+        (f"{brands[0]} {target_name} Pro (Latest Edition)", brands[0], base_price, 4.8),
+        (f"{brands[1]} {target_name} Ultra", brands[1], round(base_price * 0.85, -1), 4.7),
+        (f"{brands[2]} {target_name} Essential Series", brands[2], round(base_price * 0.75, -1), 4.5),
     ]
 
     synth_results = []
@@ -430,12 +717,12 @@ def synthesize_products_for_query(raw_query: str) -> list[dict]:
             "category": target_cat,
             "brand": m_brand.lower(),
             "price": float(m_price if m_price > 0 else 999.00),
-            "description": f"Verified authentic {m_name} engineered with high durability, tested build quality, and 1-year official warranty.",
+            "description": f"Premium quality {m_name} — engineered with high durability, rigorously tested, and backed by 1-year official warranty. Fast shipping available across India.",
             "specifications": {
-                "build_quality": "High Grade Certified Materials",
-                "features": f"Optimized {clean_keyword} performance",
+                "build_quality": "High-Grade Certified Materials",
+                "features": f"Optimized {clean_keyword} performance with premium finish",
                 "warranty": "1 Year Official Manufacturer Warranty",
-                "dispatch": "Next-Day Priority Shipping",
+                "dispatch": "Next-Day Priority Shipping (Select Cities)",
             },
             "rating": m_rating,
             "stock": 20,

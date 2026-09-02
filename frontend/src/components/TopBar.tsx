@@ -29,11 +29,11 @@ export const TopBar: React.FC<TopBarProps> = ({ sessionId, onMemoryReplay }) => 
 
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <h1 className="font-display text-[11px] text-[#1A1320] tracking-tight">
-              MUNDER DIFFLIN
-            </h1>
-            <span className="font-display text-[8px] px-1.5 py-0.5 bg-[#FF6B6B] text-[#FFFDF5] border border-[#1A1320]">
+            <h1 className="font-display text-[13px] text-[#1A1320] tracking-tight font-bold">
               AGENTPAY
+            </h1>
+            <span className="font-display text-[7px] px-1.5 py-0.5 bg-[#4ECDC4] text-[#FFFDF5] border border-[#1A1320]">
+              AI COMMERCE
             </span>
           </div>
           <span className="font-pixel text-[12px] text-[#6B5878] leading-none mt-0.5">
@@ -53,14 +53,15 @@ export const TopBar: React.FC<TopBarProps> = ({ sessionId, onMemoryReplay }) => 
       <div className="flex items-center gap-2">
         {sessionId ? (
           <div className="flex items-center gap-1.5 bg-[#FFFDF5] px-2 py-1 border-2 border-[#1A1320] shadow-[inset_1px_1px_0_#F4E9C7]">
-            <Cpu className="w-3.5 h-3.5 text-[#3D2E4A]" />
-            <span className="font-mono text-[11px] text-[#1A1320] max-w-[120px] truncate">
-              {sessionId}
+            <Cpu className="w-3.5 h-3.5 text-[#4ECDC4]" />
+            <span className="font-display text-[8px] text-[#6B5878]">SESSION:</span>
+            <span className="font-mono text-[10px] text-[#1A1320] font-bold max-w-[80px] truncate">
+              {sessionId.slice(-8).toUpperCase()}
             </span>
             <button
               onClick={handleCopySession}
               className="text-[#6B5878] hover:text-[#1A1320] transition-colors p-0.5"
-              title="Copy Session ID"
+              title="Copy Full Session ID"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-[#6BCF7F]" /> : <Copy className="w-3.5 h-3.5" />}
             </button>

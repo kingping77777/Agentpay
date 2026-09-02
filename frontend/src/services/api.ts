@@ -46,3 +46,31 @@ export const triggerPayment = async (orderId: string) => {
   const res = await api.post('/api/payments/create', { order_id: orderId });
   return res.data;
 };
+
+export const directBuyProduct = async (data: {
+  customer_id: string;
+  merchant_id: string;
+  product_id: string;
+  quantity?: number;
+  full_name: string;
+  street: string;
+  city: string;
+  pin_code: string;
+  phone: string;
+  payment_method?: string;
+}) => {
+  const res = await api.post('/api/payments/direct-buy', {
+    ...data,
+    quantity: data.quantity || 1,
+    payment_method: data.payment_method || 'UPI_QR',
+  });
+  return res.data;
+};
+
+export const confirmPayment = async (orderId: string, paymentMethod: string = 'UPI_QR') => {
+  const res = await api.post('/api/payments/confirm-payment', {
+    order_id: orderId,
+    payment_method: paymentMethod,
+  });
+  return res.data;
+};

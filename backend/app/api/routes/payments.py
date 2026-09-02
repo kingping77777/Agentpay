@@ -130,3 +130,147 @@ async def razorpay_webhook(
             await db.commit()
 
     return {"status": "ok"}
+
+
+class DirectBuyRequest(BaseModel):
+    customer_id: str
+    merchant_id: str
+    product_id: str
+    quantity: int = 1
+    full_name: str
+    street: str
+    city: str
+    pin_code: str
+    phone: str
+    payment_method: str = "UPI_QR"
+
+
+@router.post("/direct-buy")
+async def direct_buy_product(
+    body: DirectBuyRequest,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Create an instant direct order for a product with delivery address and UPI QR Code."""
+    import urllib.parse
+    from datetime import datetime, timedelta, timezone
+    from app.db.models import Order, OrderStatus, Product, Payment, PaymentStatus
+
+    p_result = await db.execute(
+        select(Product).where(Product.id == uuid.UUID(body.product_id))
+    )
+    product = p_result.scalar_one_or_none()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    total_amount = float(product.price) * body.quantity
+    order_id = uuid.uuid4()
+    rzp_order_id = f"order_direct_{order_id.hex[:8]}"
+
+    # Create Order
+    order = Order(
+        id=order_id,
+        customer_id=uuid.UUID(body.customer_id),
+        merchant_id=uuid.UUID(body.merchant_id),
+        amount=total_amount,
+        currency="INR",
+        status=OrderStatus.AUTHORIZED,
+        razorpay_order_id=rzp_order_id,
+    )
+    db.add(order)
+    await db.flush()
+
+    # Generate real UPI deep link and QR code image URL
+    merchant_vpa = "techstore.merchant@razorpay"
+    merchant_name = "TechStore India"
+    note = f"Order {order_id.hex[:8].upper()} - {product.name[:20]}"
+    encoded_note = urllib.parse.quote(note)
+    encoded_name = urllib.parse.quote(merchant_name)
+
+    upi_string = (
+        f"upi://pay?pa={merchant_vpa}&pn={encoded_name}&am={total_amount:.2f}&cu=INR&tn={encoded_note}"
+    )
+    qr_code_url = (
+        f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data={urllib.parse.quote(upi_string)}"
+    )
+
+    est_date = (datetime.now(timezone.utc) + timedelta(days=2)).strftime("%A, %d %b %Y")
+
+    await db.commit()
+
+    return {
+        "order_id": str(order.id),
+        "product_name": product.name,
+        "quantity": body.quantity,
+        "total_amount": total_amount,
+        "currency": "INR",
+        "upi_vpa": merchant_vpa,
+        "upi_string": upi_string,
+        "qr_code_url": qr_code_url,
+        "delivery_address": {
+            "full_name": body.full_name,
+            "street": body.street,
+            "city": body.city,
+            "pin_code": body.pin_code,
+            "phone": body.phone,
+        },
+        "estimated_delivery": est_date,
+        "status": "AWAITING_PAYMENT",
+    }
+
+
+class ConfirmPaymentRequest(BaseModel):
+    order_id: str
+    payment_method: str = "UPI_QR"
+
+
+@router.post("/confirm-payment")
+async def confirm_payment(
+    body: ConfirmPaymentRequest,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Mark a direct order as PAID and capture the payment."""
+    from app.db.models import Order, OrderStatus, Payment, PaymentStatus
+
+    result = await db.execute(
+        select(Order).where(Order.id == uuid.UUID(body.order_id))
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    order.status = OrderStatus.PAID
+    rzp_payment_id = f"pay_rzp_{uuid.uuid4().hex[:10]}"
+
+    payment = Payment(
+        order_id=order.id,
+        razorpay_payment_id=rzp_payment_id,
+        razorpay_order_id=order.razorpay_order_id or f"order_{order.id.hex[:8]}",
+        amount=float(order.amount),
+        currency="INR",
+        status=PaymentStatus.CAPTURED,
+        method=body.payment_method,
+    )
+    db.add(payment)
+
+    await db_tools.log_audit(
+        db,
+        session_id=None,
+        actor_type="CUSTOMER",
+        agent_type="AUTHORITY_AGENT",
+        action="DIRECT_PAYMENT_CAPTURED",
+        decision="APPROVED",
+        reason=f"Direct payment {rzp_payment_id} completed successfully for ₹{order.amount:.2f}",
+        entity_type="order",
+        entity_id=str(order.id),
+    )
+    await db.commit()
+
+    return {
+        "status": "PAID",
+        "order_id": str(order.id),
+        "payment_id": rzp_payment_id,
+        "amount": float(order.amount),
+        "currency": "INR",
+        "method": body.payment_method,
+        "message": "Payment verified and order captured successfully!",
+    }

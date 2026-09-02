@@ -48,6 +48,7 @@ export interface ChatMessage {
   timestamp: string;
   products?: Product[];
   validation?: ValidationResult;
+  policy_checks?: PolicyCheck[];
   a2a_dialogue?: A2ADialogue[];
   web_results?: WebResult[];
   order_id?: string;

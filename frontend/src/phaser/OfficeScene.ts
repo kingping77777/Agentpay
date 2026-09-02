@@ -12,22 +12,41 @@ export interface AgentState {
   currentStation: string;
 }
 
+/**
+ * OfficeScene — Retro pixel-art top-down office for the AgentPay multi-agent platform.
+ *
+ * Layout (540 × 480 canvas):
+ * ┌───────────────────────┬──────────────────────────┐
+ * │  👑 MICHAEL'S OFFICE  │  🏪 TECHSTORE HUB        │
+ * │   (Sales Discovery)   │   (Merchant Inventory)   │
+ * ├──────────┬────────────┤──────────────────────────┤
+ * │          │ 🌐 WEB HUB │                          │
+ * │          ├────────────┤  💳 PAYMENT COUNTER       │
+ * │ 🛡️ AUTH  │            │                          │
+ * ├──────────┴────────────┼──────────────────────────┤
+ * │  ☕ BREAKROOM LOUNGE   │  ⚡ SERVER ROOM           │
+ * └───────────────────────┴──────────────────────────┘
+ */
 export class OfficeScene extends Phaser.Scene {
   private characters: { [key: string]: Phaser.GameObjects.Container } = {};
   private speechBubbles: { [key: string]: Phaser.GameObjects.Container } = {};
   private statusBadges: { [key: string]: Phaser.GameObjects.Container } = {};
   private serverLights: Phaser.GameObjects.Graphics[] = [];
-  private coffeeSteamParticles: Phaser.GameObjects.Arc[] = [];
+  private tooltipText: Phaser.GameObjects.Text | null = null;
 
-  // Station Coordinates
+  // Fixed canvas dimensions
+  private W = 540;
+  private H = 480;
+
+  // Station coordinates
   private stations: { [key: string]: { x: number; y: number; name: string } } = {
-    'MICHAEL_DESK': { x: 130, y: 110, name: "Michael's Office" },
-    'MERCHANT_DESK': { x: 370, y: 110, name: "Merchant Desk" },
-    'AUTHORITY_DESK': { x: 130, y: 260, name: "Authority Desk" },
-    'PAYMENT_COUNTER': { x: 370, y: 260, name: "Payment POS Counter" },
-    'WEB_RESEARCH_HUB': { x: 250, y: 185, name: "Web Grounding Hub" },
-    'SERVER_ROOM': { x: 420, y: 390, name: "Server Room" },
-    'BREAKROOM': { x: 90, y: 400, name: "Breakroom Lounge" },
+    MICHAEL_DESK:      { x: 120, y: 100, name: "Michael's Office" },
+    MERCHANT_DESK:     { x: 400, y: 100, name: 'TechStore Hub' },
+    AUTHORITY_DESK:    { x: 120, y: 260, name: 'Authority Desk' },
+    PAYMENT_COUNTER:   { x: 400, y: 260, name: 'Payment Counter' },
+    WEB_RESEARCH_HUB:  { x: 260, y: 200, name: 'Web Grounding Hub' },
+    SERVER_ROOM:       { x: 420, y: 400, name: 'Server Room' },
+    BREAKROOM:         { x: 120, y: 400, name: 'Breakroom' },
   };
 
   private agentsData: AgentState[] = [
@@ -35,32 +54,32 @@ export class OfficeScene extends Phaser.Scene {
       id: 'SALES_AGENT',
       name: 'Michael (Sales)',
       role: 'Sales Discovery',
-      accent: 0x4ecdc4, // Sky
+      accent: 0x4ecdc4,
       shirtColor: 0x4ecdc4,
       pantColor: 0x1a1320,
-      homeX: 130,
-      homeY: 110,
+      homeX: 120,
+      homeY: 100,
       currentStation: 'MICHAEL_DESK',
     },
     {
       id: 'MERCHANT_AGENT',
       name: 'TechStore Agent',
-      role: 'Merchant Stock & Discounts',
-      accent: 0xffa07a, // Peach
+      role: 'Merchant Inventory',
+      accent: 0xffa07a,
       shirtColor: 0xffa07a,
       pantColor: 0x3d2e4a,
-      homeX: 370,
-      homeY: 110,
+      homeX: 400,
+      homeY: 100,
       currentStation: 'MERCHANT_DESK',
     },
     {
       id: 'AUTHORITY_AGENT',
       name: 'Authority Gatekeeper',
-      role: 'Policy & Hard Budget',
-      accent: 0xb197fc, // Lilac
+      role: 'Policy & Budget',
+      accent: 0xb197fc,
       shirtColor: 0xb197fc,
       pantColor: 0x1a1320,
-      homeX: 130,
+      homeX: 120,
       homeY: 260,
       currentStation: 'AUTHORITY_DESK',
     },
@@ -68,11 +87,11 @@ export class OfficeScene extends Phaser.Scene {
       id: 'CUSTOMER',
       name: 'Customer',
       role: 'Shopper',
-      accent: 0x6bcf7f, // Mint
+      accent: 0x6bcf7f,
       shirtColor: 0x6bcf7f,
       pantColor: 0x2e384d,
-      homeX: 250,
-      homeY: 310,
+      homeX: 260,
+      homeY: 320,
       currentStation: 'PAYMENT_COUNTER',
     },
   ];
@@ -86,193 +105,206 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   create() {
-    const width = this.cameras.main.width || 540;
-    const height = this.cameras.main.height || 480;
+    // 1. Floor zones
+    this.drawFloorZones();
 
-    // 1. Draw Themed Floor Zones
-    this.drawFloorZones(width, height);
+    // 2. Walls & dividers
+    this.drawWallsAndDoors();
 
-    // 2. Draw Office Walls & Room Dividers
-    this.drawWallsAndDoors(width, height);
+    // 3. Furniture & stations
+    this.drawFurniture();
 
-    // 3. Draw Rich Isometric/Top-Down Furniture & Stations
-    this.drawStationsAndFurniture();
-
-    // 4. Create Animated Character Avatars
+    // 4. Characters
     this.createCharacterAvatars();
 
-    // 5. Setup Animated Ambient Effects (Server LEDs, Coffee Steam)
-    this.time.addEvent({
-      delay: 250,
-      callback: this.blinkServerLights,
-      callbackScope: this,
-      loop: true,
-    });
+    // 5. Ambient animations
+    this.time.addEvent({ delay: 300, callback: this.blinkServerLights, callbackScope: this, loop: true });
+    this.time.addEvent({ delay: 500, callback: this.animateCoffeeSteam, callbackScope: this, loop: true });
 
-    this.time.addEvent({
-      delay: 400,
-      callback: this.animateCoffeeSteam,
-      callbackScope: this,
-      loop: true,
-    });
+    // 6. Tooltip text (shared)
+    this.tooltipText = this.add.text(0, 0, '', {
+      fontFamily: 'monospace',
+      fontSize: '9px',
+      fontStyle: 'bold',
+      color: '#FFFDF5',
+      backgroundColor: '#1A1320',
+      padding: { x: 6, y: 3 },
+    })
+      .setOrigin(0.5)
+      .setDepth(200)
+      .setVisible(false);
 
-    // Listen for agent actions and speech events from React
+    // 7. React event listeners
     this.game.events.on('agent-speak', this.handleAgentSpeech, this);
     this.game.events.on('agent-action', this.handleAgentAction, this);
     this.game.events.on('agent-message-flying', this.handleFlyingEnvelope, this);
   }
 
+  // ─── Procedural Tile Textures ──────────────────────────────────────────────
+
   private createProceduralTextures() {
-    // 1. Wood Tile Light (#E5C896)
-    const tLight = this.make.graphics({ x: 0, y: 0 });
-    tLight.fillStyle(0xe5c896, 1);
-    tLight.fillRect(0, 0, 32, 32);
-    tLight.lineStyle(1, 0xd4b57e, 0.6);
-    tLight.strokeRect(0, 0, 32, 32);
-    tLight.fillStyle(0xd9b982, 0.4);
-    tLight.fillRect(3, 8, 26, 2);
-    tLight.fillRect(6, 20, 20, 2);
-    tLight.generateTexture('tile_wood_light', 32, 32);
+    const make = (key: string, fillColor: number, lineColor: number, pattern: (g: Phaser.GameObjects.Graphics) => void) => {
+      const g = this.make.graphics({ x: 0, y: 0 });
+      g.fillStyle(fillColor, 1);
+      g.fillRect(0, 0, 32, 32);
+      g.lineStyle(1, lineColor, 0.4);
+      g.strokeRect(0, 0, 32, 32);
+      pattern(g);
+      g.generateTexture(key, 32, 32);
+      g.destroy();
+    };
 
-    // 2. Wood Tile Dark (#C9A66B)
-    const tDark = this.make.graphics({ x: 0, y: 0 });
-    tDark.fillStyle(0xc9a66b, 1);
-    tDark.fillRect(0, 0, 32, 32);
-    tDark.lineStyle(1, 0xb89255, 0.6);
-    tDark.strokeRect(0, 0, 32, 32);
-    tDark.fillStyle(0xba9457, 0.4);
-    tDark.fillRect(4, 14, 24, 2);
-    tDark.fillRect(2, 26, 28, 2);
-    tDark.generateTexture('tile_wood_dark', 32, 32);
+    // Light Oak Wood
+    make('tile_oak', 0xe5c896, 0xd4b57e, (g) => {
+      g.fillStyle(0xd9b982, 0.35);
+      g.fillRect(3, 8, 26, 2);
+      g.fillRect(6, 20, 20, 2);
+    });
 
-    // 3. Hallway Carpet (#E8D8B0)
-    const tCarpet = this.make.graphics({ x: 0, y: 0 });
-    tCarpet.fillStyle(0xe8d8b0, 1);
-    tCarpet.fillRect(0, 0, 32, 32);
-    tCarpet.lineStyle(1, 0xd8c599, 0.4);
-    tCarpet.strokeRect(0, 0, 32, 32);
-    tCarpet.fillStyle(0xd5c49a, 0.3);
-    tCarpet.fillRect(14, 14, 4, 4);
-    tCarpet.generateTexture('tile_carpet', 32, 32);
+    // Dark Walnut Wood
+    make('tile_walnut', 0xc9a66b, 0xb89255, (g) => {
+      g.fillStyle(0xba9457, 0.35);
+      g.fillRect(4, 14, 24, 2);
+      g.fillRect(2, 26, 28, 2);
+    });
 
-    // 4. Breakroom Checker Tile (#D9CFE0 / #FFFDF5)
-    const tBreak = this.make.graphics({ x: 0, y: 0 });
-    tBreak.fillStyle(0xd9cfe0, 1);
-    tBreak.fillRect(0, 0, 32, 32);
-    tBreak.fillStyle(0xfffdf5, 1);
-    tBreak.fillRect(0, 0, 16, 16);
-    tBreak.fillRect(16, 16, 16, 16);
-    tBreak.lineStyle(1, 0xa899b5, 0.5);
-    tBreak.strokeRect(0, 0, 32, 32);
-    tBreak.generateTexture('tile_breakroom', 32, 32);
+    // Carpet (Hallway / Common Area)
+    make('tile_carpet', 0xe8d8b0, 0xd8c599, (g) => {
+      g.fillStyle(0xd5c49a, 0.25);
+      g.fillRect(13, 13, 6, 6);
+    });
 
-    // 5. Executive Rug Pattern (#8B2635)
-    const tRug = this.make.graphics({ x: 0, y: 0 });
-    tRug.fillStyle(0x7a1f2d, 1);
-    tRug.fillRect(0, 0, 32, 32);
-    tRug.lineStyle(1, 0x9e2a3b, 0.6);
-    tRug.strokeRect(0, 0, 32, 32);
-    tRug.fillStyle(0xf4d35e, 0.4); // Gold trim dots
-    tRug.fillRect(4, 4, 2, 2);
-    tRug.fillRect(26, 4, 2, 2);
-    tRug.fillRect(4, 26, 2, 2);
-    tRug.fillRect(26, 26, 2, 2);
-    tRug.generateTexture('tile_rug', 32, 32);
+    // Breakroom Checker Tile
+    make('tile_check', 0xd9cfe0, 0xa899b5, (g) => {
+      g.fillStyle(0xfffdf5, 1);
+      g.fillRect(0, 0, 16, 16);
+      g.fillRect(16, 16, 16, 16);
+    });
+
+    // Executive Rug
+    make('tile_rug', 0x7a1f2d, 0x9e2a3b, (g) => {
+      g.fillStyle(0xf4d35e, 0.4);
+      g.fillRect(4, 4, 2, 2);
+      g.fillRect(26, 4, 2, 2);
+      g.fillRect(4, 26, 2, 2);
+      g.fillRect(26, 26, 2, 2);
+    });
+
+    // Server Room Tile
+    make('tile_server', 0x16131e, 0x2a2438, (g) => {
+      g.fillStyle(0x1e1a28, 0.5);
+      g.fillRect(0, 16, 32, 16);
+    });
   }
 
-  private drawFloorZones(w: number, h: number) {
+  // ─── Floor Zone Rendering ──────────────────────────────────────────────────
+
+  private drawFloorZones() {
+    const w = this.W, h = this.H;
+    const midX = 260, midY = 330;
+
     for (let x = 0; x < w; x += 32) {
       for (let y = 0; y < h; y += 32) {
-        // Zone 1: Michael's Executive Corner (Top Left)
-        if (x < 210 && y < 180) {
-          if (x >= 40 && x <= 180 && y >= 40 && y <= 150) {
+        // Michael's Executive Office (Top-Left)
+        if (x < midX && y < 180) {
+          if (x >= 40 && x <= 200 && y >= 40 && y <= 140) {
             this.add.image(x, y, 'tile_rug').setOrigin(0, 0);
           } else {
-            this.add.image(x, y, 'tile_wood_light').setOrigin(0, 0);
+            this.add.image(x, y, 'tile_oak').setOrigin(0, 0);
           }
         }
-        // Zone 2: Breakroom (Bottom Left)
-        else if (x < 210 && y >= 340) {
-          this.add.image(x, y, 'tile_breakroom').setOrigin(0, 0);
+        // TechStore Hub (Top-Right)
+        else if (x >= midX && y < 180) {
+          const alt = ((x / 32) + (y / 32)) % 2 === 0;
+          this.add.image(x, y, alt ? 'tile_oak' : 'tile_walnut').setOrigin(0, 0);
         }
-        // Zone 3: Server Room (Bottom Right)
-        else if (x >= 320 && y >= 340) {
-          const isAlt = ((x / 32) + (y / 32)) % 2 === 0;
-          this.add.image(x, y, isAlt ? 'tile_wood_dark' : 'tile_wood_light').setOrigin(0, 0);
-        }
-        // Zone 4: Central Hallway & Open Office
-        else if (x >= 200 && x <= 290) {
+        // Authority + Central Hallway (Middle-Left / Center)
+        else if (y >= 180 && y < midY && x < midX) {
           this.add.image(x, y, 'tile_carpet').setOrigin(0, 0);
-        } else {
-          const isAlt = ((x / 32) + (y / 32)) % 2 === 0;
-          this.add.image(x, y, isAlt ? 'tile_wood_light' : 'tile_wood_dark').setOrigin(0, 0);
+        }
+        // Payment Counter Area (Middle-Right)
+        else if (y >= 180 && y < midY && x >= midX) {
+          this.add.image(x, y, 'tile_carpet').setOrigin(0, 0);
+        }
+        // Breakroom (Bottom-Left)
+        else if (y >= midY && x < midX) {
+          this.add.image(x, y, 'tile_check').setOrigin(0, 0);
+        }
+        // Server Room (Bottom-Right)
+        else if (y >= midY && x >= midX) {
+          this.add.image(x, y, 'tile_server').setOrigin(0, 0);
+        }
+        else {
+          this.add.image(x, y, 'tile_oak').setOrigin(0, 0);
         }
       }
     }
   }
 
-  private drawWallsAndDoors(w: number, h: number) {
+  // ─── Walls, Doors & Room Labels ────────────────────────────────────────────
+
+  private drawWallsAndDoors() {
     const gfx = this.add.graphics();
+    const w = this.W, h = this.H;
+    const midX = 260, midY = 330;
 
-    // Outer Room Border Wall
-    gfx.lineStyle(3, 0x1a1320, 1);
-    gfx.strokeRect(8, 8, w - 16, h - 16);
+    // Outer border
+    gfx.lineStyle(4, 0x1a1320, 1);
+    gfx.strokeRect(6, 6, w - 12, h - 12);
 
-    // 1. Michael's Office Partition Walls (Top Left)
+    // ── Horizontal Dividers ──
+    // Top rooms / middle area divider (y = 180)
     gfx.fillStyle(0x8b6f47, 1);
-    gfx.fillRect(8, 175, 140, 10);
-    gfx.fillRect(205, 8, 10, 177);
+    gfx.fillRect(8, 177, midX - 60, 8);   // left wall segment
+    gfx.fillRect(midX + 10, 177, w - midX - 18, 8); // right wall segment
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeRect(8, 175, 140, 10);
-    gfx.strokeRect(205, 8, 10, 177);
+    gfx.strokeRect(8, 177, midX - 60, 8);
+    gfx.strokeRect(midX + 10, 177, w - midX - 18, 8);
 
-    // Doorway opening for Michael's Office
+    // Doorway openings
     gfx.fillStyle(0xe8d8b0, 1);
-    gfx.fillRect(148, 175, 57, 10);
+    gfx.fillRect(midX - 52, 177, 62, 8);  // Center door
 
-    // 2. Breakroom Partition (Bottom Left)
+    // Middle / Bottom divider (y = midY)
     gfx.fillStyle(0x8b6f47, 1);
-    gfx.fillRect(8, 335, 150, 10);
-    gfx.fillRect(205, 335, 10, h - 343);
+    gfx.fillRect(8, midY - 3, midX - 50, 8);
+    gfx.fillRect(midX + 20, midY - 3, w - midX - 28, 8);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeRect(8, 335, 150, 10);
-    gfx.strokeRect(205, 335, 10, h - 343);
+    gfx.strokeRect(8, midY - 3, midX - 50, 8);
+    gfx.strokeRect(midX + 20, midY - 3, w - midX - 28, 8);
 
-    // Doorway for Breakroom
+    // Doorway openings
     gfx.fillStyle(0xe8d8b0, 1);
-    gfx.fillRect(158, 335, 47, 10);
+    gfx.fillRect(midX - 48, midY - 3, 68, 8);
 
-    // 3. Server Room Partition (Bottom Right)
-    gfx.fillStyle(0x2a2438, 1);
-    gfx.fillRect(320, 335, w - 328, 10);
-    gfx.fillRect(320, 335, 10, h - 343);
+    // ── Vertical Divider (x = midX) ──
+    gfx.fillStyle(0x8b6f47, 1);
+    gfx.fillRect(midX - 4, 8, 8, 170);     // Top rooms divider
+    gfx.fillRect(midX - 4, midY + 5, 8, h - midY - 13); // Bottom rooms divider
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeRect(320, 335, w - 328, 10);
-    gfx.strokeRect(320, 335, 10, h - 343);
-
-    // Doorway for Server Room
-    gfx.fillStyle(0xe8d8b0, 1);
-    gfx.fillRect(330, 335, 45, 10);
+    gfx.strokeRect(midX - 4, 8, 8, 170);
+    gfx.strokeRect(midX - 4, midY + 5, 8, h - midY - 13);
 
     // Room Label Badges
-    this.drawRoomBadge(22, 18, "👑 MICHAEL'S OFFICE", 0x4ecdc4);
-    this.drawRoomBadge(325, 18, "🏪 TECHSTORE HUB", 0xffa07a);
-    this.drawRoomBadge(22, 345, "☕ BREAKROOM", 0xffd93d);
-    this.drawRoomBadge(385, 345, "⚡ SERVER RACK", 0x6bcf7f);
+    this.drawRoomBadge(20, 14, "👑 MICHAEL'S OFFICE", 0x4ecdc4);
+    this.drawRoomBadge(midX + 16, 14, '🏪 TECHSTORE HUB', 0xffa07a);
+    this.drawRoomBadge(20, 190, '🛡️ AUTHORITY & HUB', 0xb197fc);
+    this.drawRoomBadge(midX + 16, 190, '💳 PAYMENT DESK', 0xffd93d);
+    this.drawRoomBadge(20, midY + 8, '☕ BREAKROOM', 0x6bcf7f);
+    this.drawRoomBadge(midX + 16, midY + 8, '⚡ SERVER ROOM', 0xff6b6b);
   }
 
   private drawRoomBadge(x: number, y: number, text: string, accent: number) {
     const badge = this.add.graphics();
-    badge.fillStyle(0xfffdf5, 1);
-    badge.fillRoundedRect(x, y, 120, 18, 2);
+    badge.fillStyle(0xfffdf5, 0.92);
+    badge.fillRoundedRect(x, y, 135, 18, 3);
     badge.lineStyle(1.5, 0x1a1320, 1);
-    badge.strokeRoundedRect(x, y, 120, 18, 2);
+    badge.strokeRoundedRect(x, y, 135, 18, 3);
 
-    // Accent strip
     badge.fillStyle(accent, 1);
-    badge.fillRect(x + 2, y + 2, 4, 14);
+    badge.fillRect(x + 3, y + 3, 4, 12);
 
-    this.add.text(x + 10, y + 9, text, {
+    this.add.text(x + 12, y + 9, text, {
       fontFamily: 'monospace',
       fontSize: '8px',
       fontStyle: 'bold',
@@ -280,320 +312,397 @@ export class OfficeScene extends Phaser.Scene {
     }).setOrigin(0, 0.5);
   }
 
-  private drawStationsAndFurniture() {
-    // 1. Michael's Executive Station (130, 110)
-    this.drawExecutiveDesk(130, 95);
+  // ─── Furniture & Station Drawing ───────────────────────────────────────────
 
-    // 2. TechStore Merchant Desk (370, 110)
-    this.drawWorkstationDesk(370, 95, 0xffa07a, 'INVENTORY & CATALOG');
+  private drawFurniture() {
+    // Michael's Executive Desk
+    this.drawExecutiveDesk(120, 85);
 
-    // 3. Central Web Grounding / Library Hub (250, 185)
-    this.drawWebGroundingStation(250, 185);
+    // TechStore Merchant Station
+    this.drawWorkstationDesk(400, 85, 0xffa07a, 'INVENTORY SYSTEM');
 
-    // 4. Authority & Policy Verification Desk (130, 260)
-    this.drawWorkstationDesk(130, 245, 0xb197fc, 'SAFETY & BUDGET');
+    // Central Web Hub
+    this.drawWebGroundingStation(260, 240);
 
-    // 5. Payment Checkout Counter (370, 260)
-    this.drawPaymentCounter(370, 245);
+    // Authority Policy Desk
+    this.drawWorkstationDesk(120, 250, 0xb197fc, 'POLICY ENGINE');
 
-    // 6. Breakroom Furniture (Coffee Maker, Water Cooler, Couch)
+    // Payment Counter
+    this.drawPaymentCounter(400, 250);
+
+    // Breakroom
     this.drawBreakroomFurniture();
 
-    // 7. Server Room Racks (420, 390)
-    this.drawServerRacks(380, 375);
+    // Server Racks
+    this.drawServerRacks(360, 370);
 
-    // Potted Plants
-    this.drawBonsaiPlant(190, 30);
-    this.drawBonsaiPlant(490, 30);
-    this.drawBonsaiPlant(305, 260);
-    this.drawBonsaiPlant(190, 280);
+    // Decorative plants
+    this.drawPlant(230, 30);
+    this.drawPlant(500, 30);
+    this.drawPlant(230, 290);
+    this.drawPlant(500, 290);
   }
 
   private drawExecutiveDesk(x: number, y: number) {
     const gfx = this.add.graphics();
 
-    // Mahogany Desk
+    // L-shaped mahogany desk
     gfx.fillStyle(0x6e1423, 1);
-    gfx.fillRoundedRect(x - 30, y - 16, 60, 32, 4);
+    gfx.fillRoundedRect(x - 35, y - 18, 70, 36, 4);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeRoundedRect(x - 30, y - 16, 60, 32, 4);
+    gfx.strokeRoundedRect(x - 35, y - 18, 70, 36, 4);
 
-    // Dual Monitors
+    // Dual widescreen monitors
     gfx.fillStyle(0x1a1320, 1);
-    gfx.fillRect(x - 22, y - 12, 20, 12);
-    gfx.fillRect(x + 2, y - 12, 20, 12);
+    gfx.fillRect(x - 26, y - 14, 24, 14);
+    gfx.fillRect(x + 2, y - 14, 24, 14);
+    gfx.lineStyle(1, 0x2a2438, 1);
+    gfx.strokeRect(x - 26, y - 14, 24, 14);
+    gfx.strokeRect(x + 2, y - 14, 24, 14);
 
-    // Screen Glows
-    gfx.fillStyle(0x4ecdc4, 0.9);
-    gfx.fillRect(x - 20, y - 10, 16, 8);
-    gfx.fillStyle(0x6bcf7f, 0.9);
-    gfx.fillRect(x + 4, y - 10, 16, 8);
+    // Monitor glow (teal + green)
+    gfx.fillStyle(0x4ecdc4, 0.95);
+    gfx.fillRect(x - 24, y - 12, 20, 10);
+    gfx.fillStyle(0x6bcf7f, 0.95);
+    gfx.fillRect(x + 4, y - 12, 20, 10);
 
-    // Gold Executive Nameplate
+    // Keyboard
+    gfx.fillStyle(0xfffdf5, 1);
+    gfx.fillRect(x - 14, y + 4, 20, 6);
+    gfx.lineStyle(1, 0xd9cfe0, 1);
+    gfx.strokeRect(x - 14, y + 4, 20, 6);
+
+    // Mouse
+    gfx.fillStyle(0xd9cfe0, 1);
+    gfx.fillRect(x + 14, y + 5, 6, 4);
+
+    // Gold nameplate
     gfx.fillStyle(0xffd93d, 1);
-    gfx.fillRect(x - 10, y + 4, 20, 5);
+    gfx.fillRect(x - 12, y + 14, 24, 5);
     gfx.lineStyle(1, 0x1a1320, 1);
-    gfx.strokeRect(x - 10, y + 4, 20, 5);
+    gfx.strokeRect(x - 12, y + 14, 24, 5);
 
-    // Executive Chair
+    // Executive leather chair
     gfx.fillStyle(0x8b2635, 1);
-    gfx.fillCircle(x, y + 24, 10);
+    gfx.fillCircle(x, y + 30, 11);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeCircle(x, y + 24, 10);
+    gfx.strokeCircle(x, y + 30, 11);
+    // Chair wheels
+    gfx.fillStyle(0x3d2e4a, 1);
+    for (let a = 0; a < 5; a++) {
+      const angle = (a / 5) * Math.PI * 2 - Math.PI / 2;
+      gfx.fillCircle(x + Math.cos(angle) * 13, y + 30 + Math.sin(angle) * 13, 2);
+    }
   }
 
   private drawWorkstationDesk(x: number, y: number, screenColor: number, label: string) {
     const gfx = this.add.graphics();
 
-    // Desk
+    // Desk surface
     gfx.fillStyle(0xd49b4b, 1);
-    gfx.fillRoundedRect(x - 26, y - 15, 52, 30, 3);
+    gfx.fillRoundedRect(x - 28, y - 16, 56, 32, 3);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeRoundedRect(x - 26, y - 15, 52, 30, 3);
+    gfx.strokeRoundedRect(x - 28, y - 16, 56, 32, 3);
 
-    // CRT Monitor
+    // Monitor (CRT style)
     gfx.fillStyle(0x2a2438, 1);
-    gfx.fillRect(x - 12, y - 12, 24, 14);
+    gfx.fillRect(x - 14, y - 14, 28, 16);
     gfx.lineStyle(1.5, 0x1a1320, 1);
-    gfx.strokeRect(x - 12, y - 12, 24, 14);
+    gfx.strokeRect(x - 14, y - 14, 28, 16);
 
-    // Glowing Screen
+    // Glowing screen
     gfx.fillStyle(screenColor, 0.9);
-    gfx.fillRect(x - 10, y - 10, 20, 10);
+    gfx.fillRect(x - 12, y - 12, 24, 12);
 
-    // Keyboard & Mouse
+    // Code lines on screen
+    gfx.fillStyle(0xfffdf5, 0.4);
+    for (let i = 0; i < 4; i++) {
+      gfx.fillRect(x - 10 + (i % 2) * 3, y - 11 + i * 3, 10 + (i % 3) * 4, 1);
+    }
+
+    // Keyboard & coffee mug
     gfx.fillStyle(0xfffdf5, 1);
-    gfx.fillRect(x - 10, y + 4, 14, 5);
+    gfx.fillRect(x - 10, y + 4, 16, 5);
     gfx.fillStyle(0xff6b6b, 1);
-    gfx.fillCircle(x + 12, y + 6, 2.5); // Coffee Mug
+    gfx.fillCircle(x + 14, y + 7, 3);
 
-    // Swivel Chair
+    // Standard chair
     gfx.fillStyle(0x3d2e4a, 1);
-    gfx.fillCircle(x, y + 22, 9);
+    gfx.fillCircle(x, y + 26, 9);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeCircle(x, y + 22, 9);
+    gfx.strokeCircle(x, y + 26, 9);
 
-    // Label tag
-    this.add.text(x, y - 22, label, {
+    // Label
+    this.add.text(x, y - 24, label, {
       fontFamily: 'monospace',
       fontSize: '7px',
-      color: '#3D2E4A',
       fontStyle: 'bold',
+      color: '#3D2E4A',
     }).setOrigin(0.5);
   }
 
   private drawWebGroundingStation(x: number, y: number) {
     const gfx = this.add.graphics();
 
-    // Round Holographic / Library Table
+    // Holographic table
     gfx.fillStyle(0x3d2e4a, 1);
-    gfx.fillCircle(x, y, 22);
+    gfx.fillCircle(x, y, 24);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeCircle(x, y, 22);
+    gfx.strokeCircle(x, y, 24);
 
-    // Globe / Radar Screen
-    gfx.fillStyle(0x4ecdc4, 0.85);
-    gfx.fillCircle(x, y, 14);
-    gfx.lineStyle(1.5, 0xfffdf5, 0.8);
-    gfx.strokeCircle(x, y, 10);
+    // Globe radar screen
+    gfx.fillStyle(0x4ecdc4, 0.8);
+    gfx.fillCircle(x, y, 16);
 
-    // Pulsing Antenna Center
+    // Radar rings
+    gfx.lineStyle(1, 0xfffdf5, 0.6);
+    gfx.strokeCircle(x, y, 12);
+    gfx.strokeCircle(x, y, 8);
+
+    // Center blip
     gfx.fillStyle(0xffd93d, 1);
     gfx.fillCircle(x, y, 4);
+    gfx.lineStyle(1, 0x1a1320, 1);
+    gfx.strokeCircle(x, y, 4);
 
-    this.add.text(x, y + 28, '🌐 LIVE WEB HUB', {
+    // Radial dots (data points)
+    const dots = [
+      { dx: -10, dy: -6, c: 0xff6b6b },
+      { dx: 8, dy: -8, c: 0x6bcf7f },
+      { dx: -5, dy: 10, c: 0xb197fc },
+      { dx: 11, dy: 5, c: 0xffa07a },
+    ];
+    dots.forEach(({ dx, dy, c }) => {
+      gfx.fillStyle(c, 1);
+      gfx.fillCircle(x + dx, y + dy, 2);
+    });
+
+    this.add.text(x, y + 30, '🌐 LIVE WEB HUB', {
       fontFamily: 'monospace',
       fontSize: '8px',
-      color: '#1A1320',
       fontStyle: 'bold',
+      color: '#1A1320',
     }).setOrigin(0.5);
   }
 
   private drawPaymentCounter(x: number, y: number) {
     const gfx = this.add.graphics();
 
-    // Marble Checkout Counter
+    // Marble counter
     gfx.fillStyle(0xfffdf5, 1);
-    gfx.fillRoundedRect(x - 28, y - 14, 56, 28, 3);
+    gfx.fillRoundedRect(x - 32, y - 15, 64, 30, 3);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeRoundedRect(x - 28, y - 14, 56, 28, 3);
+    gfx.strokeRoundedRect(x - 32, y - 15, 64, 30, 3);
 
-    // Cash Register POS Machine
+    // Cash register
     gfx.fillStyle(0x1a1320, 1);
-    gfx.fillRect(x - 18, y - 10, 18, 14);
-    gfx.fillStyle(0x6bcf7f, 1); // Green POS display
-    gfx.fillRect(x - 16, y - 8, 14, 6);
+    gfx.fillRect(x - 20, y - 12, 20, 16);
+    gfx.fillStyle(0x6bcf7f, 1);
+    gfx.fillRect(x - 18, y - 10, 16, 8);
 
-    // Razorpay Chip Reader & Scanner
+    // Card terminal
     gfx.fillStyle(0xffd93d, 1);
-    gfx.fillRect(x + 4, y - 6, 12, 12);
+    gfx.fillRect(x + 6, y - 8, 14, 14);
     gfx.lineStyle(1, 0x1a1320, 1);
-    gfx.strokeRect(x + 4, y - 6, 12, 12);
+    gfx.strokeRect(x + 6, y - 8, 14, 14);
 
-    this.add.text(x, y - 20, '💳 RAZORPAY POS', {
+    // Card slot line
+    gfx.fillStyle(0x1a1320, 1);
+    gfx.fillRect(x + 10, y - 2, 6, 2);
+
+    this.add.text(x, y - 22, '💳 RAZORPAY POS', {
       fontFamily: 'monospace',
       fontSize: '7px',
-      color: '#1A1320',
       fontStyle: 'bold',
+      color: '#1A1320',
     }).setOrigin(0.5);
   }
 
   private drawBreakroomFurniture() {
     const gfx = this.add.graphics();
 
-    // Coffee Kitchen Counter
+    // Coffee counter
     gfx.fillStyle(0xfff8e7, 1);
-    gfx.fillRect(20, 370, 55, 26);
+    gfx.fillRect(20, 365, 60, 28);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeRect(20, 370, 55, 26);
+    gfx.strokeRect(20, 365, 60, 28);
 
-    // Coffee Maker Machine
+    // Coffee machine
     gfx.fillStyle(0x3d2e4a, 1);
-    gfx.fillRect(25, 362, 16, 14);
+    gfx.fillRect(26, 356, 18, 16);
     gfx.fillStyle(0xff6b6b, 1);
-    gfx.fillRect(27, 368, 12, 6);
+    gfx.fillRect(29, 363, 12, 7);
 
-    // Water Cooler Station
+    // Water cooler
     gfx.fillStyle(0xfffdf5, 1);
-    gfx.fillRect(85, 370, 18, 26);
+    gfx.fillRect(95, 370, 20, 26);
     gfx.lineStyle(1.5, 0x1a1320, 1);
-    gfx.strokeRect(85, 370, 18, 26);
-    gfx.fillStyle(0x4ecdc4, 0.85); // Water jug
-    gfx.fillRoundedRect(87, 356, 14, 15, 3);
+    gfx.strokeRect(95, 370, 20, 26);
+    gfx.fillStyle(0x4ecdc4, 0.85);
+    gfx.fillRoundedRect(97, 356, 16, 16, 4);
 
-    // Lounge Couch
+    // Lounge couch
     gfx.fillStyle(0x4ba85c, 1);
-    gfx.fillRoundedRect(120, 375, 45, 22, 4);
+    gfx.fillRoundedRect(130, 375, 55, 24, 5);
     gfx.lineStyle(2, 0x1a1320, 1);
-    gfx.strokeRoundedRect(120, 375, 45, 22, 4);
+    gfx.strokeRoundedRect(130, 375, 55, 24, 5);
+
+    // Cushion detail
+    gfx.fillStyle(0x3d9e4d, 0.5);
+    gfx.fillRoundedRect(135, 380, 20, 14, 3);
+    gfx.fillRoundedRect(160, 380, 20, 14, 3);
+
+    // Small table
+    gfx.fillStyle(0xd49b4b, 1);
+    gfx.fillCircle(200, 395, 10);
+    gfx.lineStyle(1.5, 0x1a1320, 1);
+    gfx.strokeCircle(200, 395, 10);
   }
 
   private drawServerRacks(x: number, y: number) {
     const gfx = this.add.graphics();
 
-    for (let r = 0; r < 3; r++) {
-      const rx = x + r * 36;
-      gfx.fillStyle(0x13111c, 1);
-      gfx.fillRect(rx, y, 26, 52);
-      gfx.lineStyle(2, 0x1a1320, 1);
-      gfx.strokeRect(rx, y, 26, 52);
+    for (let r = 0; r < 4; r++) {
+      const rx = x + r * 38;
 
-      // Server rack grill slots
+      // Rack chassis
+      gfx.fillStyle(0x13111c, 1);
+      gfx.fillRect(rx, y, 28, 56);
+      gfx.lineStyle(2, 0x1a1320, 1);
+      gfx.strokeRect(rx, y, 28, 56);
+
+      // Rack unit slots
       gfx.fillStyle(0x2a2438, 1);
-      for (let s = 0; s < 4; s++) {
-        gfx.fillRect(rx + 3, y + 6 + s * 11, 20, 7);
+      for (let s = 0; s < 5; s++) {
+        gfx.fillRect(rx + 3, y + 4 + s * 10, 22, 7);
       }
 
-      // Dynamic LED Container
+      // LED container (dynamic)
       const lightGfx = this.add.graphics();
       this.serverLights.push(lightGfx);
     }
   }
 
-  private drawBonsaiPlant(x: number, y: number) {
+  private drawPlant(x: number, y: number) {
     const gfx = this.add.graphics();
-    gfx.fillStyle(0xba5d39, 1); // Pot
+
+    // Pot
+    gfx.fillStyle(0xba5d39, 1);
     gfx.fillRoundedRect(x, y + 10, 16, 14, 2);
     gfx.lineStyle(1.5, 0x1a1320, 1);
     gfx.strokeRoundedRect(x, y + 10, 16, 14, 2);
 
-    gfx.fillStyle(0x6bcf7f, 1); // Leaves
+    // Leaves (layered spheres)
+    gfx.fillStyle(0x6bcf7f, 1);
     gfx.fillCircle(x + 8, y + 6, 9);
     gfx.fillStyle(0x4ba85c, 1);
     gfx.fillCircle(x + 4, y + 9, 7);
     gfx.fillCircle(x + 12, y + 9, 7);
+    gfx.fillStyle(0x3d8f44, 1);
+    gfx.fillCircle(x + 8, y + 3, 5);
   }
 
+  // ─── Ambient Animations ────────────────────────────────────────────────────
+
   private blinkServerLights() {
-    const colors = [0x6bcf7f, 0x4ecdc4, 0xffd93d, 0xff6b6b];
+    const colors = [0x6bcf7f, 0x4ecdc4, 0xffd93d, 0xff6b6b, 0xb197fc];
     this.serverLights.forEach((gfx, idx) => {
       gfx.clear();
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 5; i++) {
         const color = colors[Math.floor(Math.random() * colors.length)];
-        gfx.fillStyle(color, 1);
-        gfx.fillRect(384 + idx * 36, 383 + i * 11, 5, 4);
+        const alpha = 0.6 + Math.random() * 0.4;
+        gfx.fillStyle(color, alpha);
+        gfx.fillCircle(364 + idx * 38 + 22, 374 + i * 10, 2);
       }
     });
   }
 
   private animateCoffeeSteam() {
-    // Steam particle rising from coffee machine
-    const steam = this.add.circle(33, 358, 2, 0xffffff, 0.7);
+    const steam = this.add.circle(35, 352, 2.5, 0xffffff, 0.6);
     this.tweens.add({
       targets: steam,
-      y: 345,
+      y: 336,
       alpha: 0,
-      scale: 1.8,
-      duration: 1000,
+      scale: 2,
+      duration: 1200,
       ease: 'Sine.easeOut',
       onComplete: () => steam.destroy(),
     });
   }
 
+  // ─── Character Avatars ─────────────────────────────────────────────────────
+
   private createCharacterAvatars() {
     this.agentsData.forEach((agent) => {
-      const avatar = this.createPixelAvatarContainer(agent);
+      const avatar = this.createAvatar(agent);
       this.characters[agent.id] = avatar;
     });
   }
 
-  private createPixelAvatarContainer(agent: AgentState): Phaser.GameObjects.Container {
+  private createAvatar(agent: AgentState): Phaser.GameObjects.Container {
     const container = this.add.container(agent.homeX, agent.homeY);
+    container.setDepth(100);
     const gfx = this.add.graphics();
 
-    // Soft Shadow
-    gfx.fillStyle(0x1a1320, 0.35);
-    gfx.fillEllipse(0, 18, 20, 7);
+    // Shadow
+    gfx.fillStyle(0x1a1320, 0.3);
+    gfx.fillEllipse(0, 20, 22, 8);
 
-    // Pants / Legs
+    // Legs
     gfx.fillStyle(agent.pantColor, 1);
-    gfx.fillRect(-5, 7, 4, 11);
-    gfx.fillRect(1, 7, 4, 11);
+    gfx.fillRect(-5, 7, 4, 12);
+    gfx.fillRect(1, 7, 4, 12);
     gfx.lineStyle(1, 0x1a1320, 1);
-    gfx.strokeRect(-5, 7, 4, 11);
-    gfx.strokeRect(1, 7, 4, 11);
+    gfx.strokeRect(-5, 7, 4, 12);
+    gfx.strokeRect(1, 7, 4, 12);
 
-    // Torso / Shirt
+    // Torso
     gfx.fillStyle(agent.shirtColor, 1);
-    gfx.fillRect(-7, -4, 14, 12);
+    gfx.fillRoundedRect(-8, -5, 16, 13, 2);
     gfx.lineStyle(1.5, 0x1a1320, 1);
-    gfx.strokeRect(-7, -4, 14, 12);
+    gfx.strokeRoundedRect(-8, -5, 16, 13, 2);
 
-    // Tie / Collar
+    // Tie / collar detail
     gfx.fillStyle(0x1a1320, 1);
-    gfx.fillRect(-1, -4, 2, 8);
+    gfx.fillRect(-1, -5, 2, 10);
 
     // Head
     gfx.fillStyle(0xffd8b3, 1);
-    gfx.fillCircle(0, -11, 8);
+    gfx.fillCircle(0, -12, 9);
     gfx.lineStyle(1.5, 0x1a1320, 1);
-    gfx.strokeCircle(0, -11, 8);
+    gfx.strokeCircle(0, -12, 9);
 
-    // Hair
-    gfx.fillStyle(agent.id === 'SALES_AGENT' ? 0x2e1a0c : 0x4a2e18, 1);
-    gfx.fillCircle(0, -15, 8);
-    gfx.fillRect(-7, -17, 14, 6);
+    // Hair (varies per agent)
+    const hairColor = agent.id === 'SALES_AGENT' ? 0x2e1a0c
+      : agent.id === 'MERCHANT_AGENT' ? 0x4a2e18
+      : agent.id === 'AUTHORITY_AGENT' ? 0x1a1320
+      : 0x5a3a1a;
+    gfx.fillStyle(hairColor, 1);
+    gfx.fillArc(0, -14, 9, Phaser.Math.DegToRad(180), Phaser.Math.DegToRad(360), false);
+    gfx.fillRect(-8, -18, 16, 5);
 
     // Eyes
     gfx.fillStyle(0x1a1320, 1);
-    gfx.fillRect(-4, -12, 2, 2);
-    gfx.fillRect(2, -12, 2, 2);
+    gfx.fillRect(-4, -13, 2, 2);
+    gfx.fillRect(2, -13, 2, 2);
+
+    // Smile
+    gfx.fillStyle(0x1a1320, 1);
+    gfx.fillRect(-2, -9, 4, 1);
 
     container.add(gfx);
 
-    // Nameplate Badge
+    // Nameplate badge
     const badge = this.add.graphics();
-    badge.fillStyle(0xfffdf5, 1);
-    badge.fillRoundedRect(-42, 20, 84, 16, 2);
+    badge.fillStyle(0xfffdf5, 0.95);
+    badge.fillRoundedRect(-46, 24, 92, 16, 3);
     badge.lineStyle(1.5, 0x1a1320, 1);
-    badge.strokeRoundedRect(-42, 20, 84, 16, 2);
-
+    badge.strokeRoundedRect(-46, 24, 92, 16, 3);
     badge.fillStyle(agent.accent, 1);
-    badge.fillRect(-38, 24, 6, 8);
-
+    badge.fillRect(-42, 28, 6, 8);
     container.add(badge);
 
-    const nameText = this.add.text(2, 28, agent.name, {
+    const nameText = this.add.text(0, 32, agent.name, {
       fontFamily: 'monospace',
       fontSize: '8px',
       fontStyle: 'bold',
@@ -601,84 +710,93 @@ export class OfficeScene extends Phaser.Scene {
     }).setOrigin(0.5);
     container.add(nameText);
 
-    // Status Emote Floating Container
-    const emoteContainer = this.add.container(0, -28);
+    // Status emote
+    const emoteContainer = this.add.container(0, -30);
     const emoteBg = this.add.graphics();
     emoteBg.fillStyle(agent.accent, 1);
-    emoteBg.fillCircle(0, 0, 8);
+    emoteBg.fillCircle(0, 0, 9);
     emoteBg.lineStyle(1.5, 0x1a1320, 1);
-    emoteBg.strokeCircle(0, 0, 8);
-
-    const emoteText = this.add.text(0, 0, '⚡', {
-      fontSize: '8px',
-    }).setOrigin(0.5);
-
+    emoteBg.strokeCircle(0, 0, 9);
+    const emoteText = this.add.text(0, 0, '⚡', { fontSize: '9px' }).setOrigin(0.5);
     emoteContainer.add([emoteBg, emoteText]);
     emoteContainer.setVisible(false);
     container.add(emoteContainer);
     this.statusBadges[agent.id] = emoteContainer;
 
-    // SNES Speech Bubble
-    const bubbleContainer = this.add.container(0, -48);
+    // Speech bubble
+    const bubbleContainer = this.add.container(0, -52);
     bubbleContainer.setVisible(false);
 
     const bubbleBg = this.add.graphics();
     bubbleBg.fillStyle(0xfffdf5, 1);
-    bubbleBg.fillRoundedRect(-85, -22, 170, 36, 4);
+    bubbleBg.fillRoundedRect(-90, -24, 180, 40, 5);
     bubbleBg.lineStyle(2, 0x1a1320, 1);
-    bubbleBg.strokeRoundedRect(-85, -22, 170, 36, 4);
+    bubbleBg.strokeRoundedRect(-90, -24, 180, 40, 5);
 
+    // Inner border accent
     bubbleBg.lineStyle(1, 0xf4e9c7, 1);
-    bubbleBg.strokeRoundedRect(-83, -20, 166, 32, 2);
+    bubbleBg.strokeRoundedRect(-88, -22, 176, 36, 3);
 
-    // Pointer
+    // Speech pointer
     bubbleBg.fillStyle(0xfffdf5, 1);
-    bubbleBg.fillTriangle(0, 18, -6, 12, 6, 12);
+    bubbleBg.fillTriangle(0, 20, -7, 14, 7, 14);
     bubbleBg.lineStyle(2, 0x1a1320, 1);
-    bubbleBg.lineBetween(0, 18, -6, 12);
-    bubbleBg.lineBetween(0, 18, 6, 12);
+    bubbleBg.lineBetween(0, 20, -7, 14);
+    bubbleBg.lineBetween(0, 20, 7, 14);
 
     const bubbleText = this.add.text(0, -4, '', {
       fontFamily: 'monospace',
       fontSize: '9px',
       fontStyle: 'bold',
       color: '#1A1320',
-      wordWrap: { width: 155 },
+      wordWrap: { width: 165 },
       align: 'center',
     }).setOrigin(0.5);
 
     bubbleContainer.add([bubbleBg, bubbleText]);
     container.add(bubbleContainer);
-
     this.speechBubbles[agent.id] = bubbleContainer;
 
-    // Subtle Idle Sway
+    // Idle breathing animation
     this.tweens.add({
       targets: container,
       y: agent.homeY - 2,
-      duration: 1000 + Math.random() * 500,
+      duration: 1200 + Math.random() * 600,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut',
     });
 
+    // Make interactive
+    container.setSize(50, 60);
+    container.setInteractive({ useHandCursor: true });
+    container.on('pointerover', () => {
+      if (this.tooltipText) {
+        this.tooltipText.setText(`${agent.name}\n${agent.role}`);
+        this.tooltipText.setPosition(container.x, container.y - 62);
+        this.tooltipText.setVisible(true);
+      }
+    });
+    container.on('pointerout', () => {
+      if (this.tooltipText) this.tooltipText.setVisible(false);
+    });
+
     return container;
   }
 
-  // Walk Avatar to Station with step animation
+  // ─── Agent Movement ────────────────────────────────────────────────────────
+
   public moveAgentToStation(agentId: string, stationKey: string, onArrival?: () => void) {
     const avatar = this.characters[agentId];
     const station = this.stations[stationKey];
     if (!avatar || !station) return;
 
-    // Show walking emote
     const emote = this.statusBadges[agentId];
     if (emote) {
       emote.setVisible(true);
       (emote.getAt(1) as Phaser.GameObjects.Text).setText('🚶');
     }
 
-    // Tween to target station
     this.tweens.add({
       targets: avatar,
       x: station.x,
@@ -686,33 +804,36 @@ export class OfficeScene extends Phaser.Scene {
       duration: 800,
       ease: 'Power2.easeOut',
       onComplete: () => {
-        if (emote) {
-          (emote.getAt(1) as Phaser.GameObjects.Text).setText('⚡');
-        }
+        if (emote) (emote.getAt(1) as Phaser.GameObjects.Text).setText('⚡');
         if (onArrival) onArrival();
       },
     });
   }
 
-  public handleAgentSpeech(data: { agent: string; text: string }) {
-    const avatar = this.characters[data.agent];
-    const bubble = this.speechBubbles[data.agent];
+  // ─── Event Handlers (from React) ───────────────────────────────────────────
 
-    // Determine task station based on message context
-    if (data.text.toLowerCase().includes('laptop') || data.text.toLowerCase().includes('search')) {
+  public handleAgentSpeech(data: { agent: string; text: string }) {
+    const msg = data.text.toLowerCase();
+
+    // Context-driven character movement
+    if (msg.includes('search') || msg.includes('phone') || msg.includes('laptop') || msg.includes('find') || msg.includes('looking')) {
       this.moveAgentToStation('SALES_AGENT', 'WEB_RESEARCH_HUB');
-    } else if (data.text.toLowerCase().includes('cart') || data.text.toLowerCase().includes('discount')) {
+    } else if (msg.includes('cart') || msg.includes('discount') || msg.includes('stock') || msg.includes('inventory')) {
       this.moveAgentToStation('MERCHANT_AGENT', 'MERCHANT_DESK');
       this.moveAgentToStation('SALES_AGENT', 'MERCHANT_DESK');
-    } else if (data.text.toLowerCase().includes('pay') || data.text.toLowerCase().includes('order')) {
+    } else if (msg.includes('pay') || msg.includes('order') || msg.includes('checkout') || msg.includes('buy')) {
       this.moveAgentToStation('CUSTOMER', 'PAYMENT_COUNTER');
       this.moveAgentToStation('AUTHORITY_AGENT', 'PAYMENT_COUNTER');
+    } else if (msg.includes('policy') || msg.includes('budget') || msg.includes('limit') || msg.includes('verify')) {
+      this.moveAgentToStation('AUTHORITY_AGENT', 'AUTHORITY_DESK');
     }
 
+    // Show speech bubble
+    const bubble = this.speechBubbles[data.agent];
     if (bubble) {
       const textObj = bubble.getAt(1) as Phaser.GameObjects.Text;
       if (textObj) {
-        textObj.setText(data.text.slice(0, 52) + (data.text.length > 52 ? '...' : ''));
+        textObj.setText(data.text.slice(0, 55) + (data.text.length > 55 ? '…' : ''));
       }
       bubble.setVisible(true);
       bubble.setAlpha(1);
@@ -720,8 +841,8 @@ export class OfficeScene extends Phaser.Scene {
       this.tweens.add({
         targets: bubble,
         alpha: 0,
-        delay: 4500,
-        duration: 400,
+        delay: 5000,
+        duration: 500,
         onComplete: () => bubble.setVisible(false),
       });
     }
@@ -729,15 +850,23 @@ export class OfficeScene extends Phaser.Scene {
 
   public handleAgentAction(data: { agent: string; action: string }) {
     const emote = this.statusBadges[data.agent];
-    if (emote) {
-      const textObj = emote.getAt(1) as Phaser.GameObjects.Text;
-      if (data.action === 'SEARCH') textObj.setText('🔍');
-      else if (data.action === 'VALIDATE') textObj.setText('🛡️');
-      else if (data.action === 'PAY') textObj.setText('💳');
-      else textObj.setText('⚡');
+    if (!emote) return;
 
-      emote.setVisible(true);
-    }
+    const textObj = emote.getAt(1) as Phaser.GameObjects.Text;
+    const actionEmoji: { [k: string]: string } = {
+      SEARCH: '🔍',
+      VALIDATE: '🛡️',
+      PAY: '💳',
+      CART: '🛒',
+      NEGOTIATE: '🤝',
+    };
+    textObj.setText(actionEmoji[data.action] || '⚡');
+    emote.setVisible(true);
+
+    // Auto-hide after delay
+    this.time.delayedCall(3000, () => {
+      textObj.setText('⚡');
+    });
   }
 
   public handleFlyingEnvelope(data: { from: string; to: string }) {
@@ -745,23 +874,50 @@ export class OfficeScene extends Phaser.Scene {
     const recipient = this.characters[data.to] || this.characters['MERCHANT_AGENT'];
     if (!sender || !recipient) return;
 
-    const envelope = this.add.container(sender.x, sender.y - 15);
+    const envelope = this.add.container(sender.x, sender.y - 18);
+    envelope.setDepth(150);
     const gfx = this.add.graphics();
+
+    // Envelope body
     gfx.fillStyle(0xfffdf5, 1);
-    gfx.fillRect(-8, -5, 16, 10);
+    gfx.fillRect(-9, -6, 18, 12);
     gfx.lineStyle(1.5, 0x1a1320, 1);
-    gfx.strokeRect(-8, -5, 16, 10);
+    gfx.strokeRect(-9, -6, 18, 12);
+
+    // Envelope flap
     gfx.fillStyle(0xff6b6b, 1);
-    gfx.fillTriangle(0, 1, -6, -4, 6, -4);
+    gfx.fillTriangle(0, 2, -7, -5, 7, -5);
     envelope.add(gfx);
 
+    // Trail particles
     this.tweens.add({
       targets: envelope,
       x: recipient.x,
-      y: recipient.y - 15,
-      duration: 650,
+      y: recipient.y - 18,
+      duration: 700,
       ease: 'Quad.easeInOut',
+      onUpdate: () => {
+        const trail = this.add.circle(envelope.x, envelope.y + 4, 1.5, 0xffd93d, 0.5);
+        trail.setDepth(149);
+        this.tweens.add({
+          targets: trail,
+          alpha: 0,
+          scale: 0.3,
+          duration: 300,
+          onComplete: () => trail.destroy(),
+        });
+      },
       onComplete: () => {
+        // Delivery flash
+        const flash = this.add.circle(recipient.x, recipient.y - 10, 12, 0xffd93d, 0.6);
+        flash.setDepth(150);
+        this.tweens.add({
+          targets: flash,
+          alpha: 0,
+          scale: 2.5,
+          duration: 400,
+          onComplete: () => flash.destroy(),
+        });
         envelope.destroy();
       },
     });
