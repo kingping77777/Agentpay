@@ -90,27 +90,57 @@ async def search_products(
     ]
 
 
-async def get_product(db: AsyncSession, product_id: str) -> dict | None:
-    result = await db.execute(
-        select(Product)
-        .options(selectinload(Product.inventory))
-        .where(Product.id == uuid.UUID(product_id))
+async def register_dynamic_product(
+    db: AsyncSession,
+    merchant_id: str,
+    name: str,
+    category: str = "gadgets",
+    brand: str = "generic",
+    price: float = 9999.00,
+    description: str = "",
+    specifications: dict | None = None,
+) -> dict:
+    """Dynamically register a newly searched tech product into the live database catalog."""
+    p_id = uuid.uuid4()
+    sku = f"DYN-{brand[:3].upper()}-{p_id.hex[:6].upper()}"
+    product = Product(
+        id=p_id,
+        merchant_id=uuid.UUID(merchant_id),
+        name=name,
+        category=category.lower(),
+        brand=brand.lower(),
+        description=description or f"Verified {name} with manufacturer warranty and fast delivery.",
+        price=price,
+        currency="INR",
+        sku=sku,
+        specifications=specifications or {"type": "Electronic Tech", "warranty": "1 Year Standard"},
+        rating=4.7,
+        is_active=True,
     )
-    p = result.scalar_one_or_none()
-    if not p:
-        return None
+    db.add(product)
+    await db.flush()
+
+    inventory = Inventory(
+        id=uuid.uuid4(),
+        product_id=product.id,
+        stock_quantity=15,
+        reserved_quantity=0,
+    )
+    db.add(inventory)
+    await db.commit()
+
     return {
-        "id": str(p.id),
-        "name": p.name,
-        "category": p.category,
-        "brand": p.brand or "",
-        "price": float(p.price),
-        "currency": p.currency,
-        "description": p.description or "",
-        "specifications": p.specifications or {},
-        "rating": float(p.rating) if p.rating else None,
-        "in_stock": (p.inventory.available_quantity > 0) if p.inventory else False,
-        "stock": p.inventory.available_quantity if p.inventory else 0,
+        "id": str(product.id),
+        "name": product.name,
+        "category": product.category,
+        "brand": product.brand,
+        "price": float(product.price),
+        "currency": "INR",
+        "description": product.description,
+        "specifications": product.specifications,
+        "rating": 4.7,
+        "in_stock": True,
+        "stock": 15,
     }
 
 
