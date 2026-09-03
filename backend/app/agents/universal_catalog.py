@@ -711,7 +711,7 @@ def resolve_product_image(cat: str, name: str) -> str:
                         })
 
         if matching_products:
-            return matching_products[:4]
+            return matching_products[:8]
 
     # 2. Universal Smart Fallback Generator for any arbitrary product term
     target_name = clean_keyword.title() if clean_keyword else "Premium Tech Item"
@@ -735,48 +735,51 @@ def resolve_product_image(cat: str, name: str) -> str:
 
     # Realistic brand pools by inferred category
     brand_pools = {
-        "electronics": ["Anker", "Belkin", "Baseus", "Portronics"],
-        "gaming": ["Cosmic Byte", "Redgear", "HyperX", "Ant Esports"],
-        "beauty": ["Mamaearth", "The Body Shop", "L'Oreal", "Nivea"],
-        "stationery": ["Parker", "Faber-Castell", "Classmate", "Cello"],
-        "toys": ["Lego", "Funskool", "Mattel", "Hasbro"],
-        "automotive": ["Bosch", "Mivi", "Qubo", "70Mai"],
-        "sports": ["Nivia", "Yonex", "Cosco", "SG"],
-        "books": ["Penguin", "HarperCollins", "Rupa", "Scholastic"],
-        "consumer_goods": ["ApexTech", "NovaGear", "ProElite", "UrbanLux"],
+        "electronics": ["Anker", "Belkin", "Baseus", "Portronics", "Ambrane", "Stuffcool"],
+        "gaming": ["Cosmic Byte", "Redgear", "HyperX", "Ant Esports", "Logitech G", "Razer"],
+        "beauty": ["Mamaearth", "The Body Shop", "L'Oreal", "Nivea", "Plum", "Minimalist"],
+        "stationery": ["Parker", "Faber-Castell", "Classmate", "Cello", "Camlin", "Pilot"],
+        "toys": ["Lego", "Funskool", "Mattel", "Hasbro", "Hot Wheels", "Barbie"],
+        "automotive": ["Bosch", "Mivi", "Qubo", "70Mai", "Portronics", "AmazonBasics"],
+        "sports": ["Nivia", "Yonex", "Cosco", "SG", "Puma", "Decathlon"],
+        "books": ["Penguin", "HarperCollins", "Rupa", "Scholastic", "Bloomsbury", "Vintage"],
+        "consumer_goods": ["ApexTech", "NovaGear", "ProElite", "UrbanLux", "Zenith", "PrimeCraft"],
     }
     brands = brand_pools.get(target_cat, brand_pools["consumer_goods"])
 
     # Estimate price from user budget
     if user_budget > 0:
-        base_price = round(user_budget * 0.92, -1)
+        base_price = round(user_budget * 0.95, -1)
     else:
         base_price = 2499.00
 
-    # Build 3 varied branded models
+    # Build 6 varied branded models & recommended alternatives
     model_variants = [
-        (f"{brands[0]} {target_name} Pro (Latest Edition)", brands[0], base_price, 4.8),
-        (f"{brands[1]} {target_name} Ultra", brands[1], round(base_price * 0.85, -1), 4.7),
-        (f"{brands[2]} {target_name} Essential Series", brands[2], round(base_price * 0.75, -1), 4.5),
+        (f"{brands[0]} {target_name} Flagship Pro Edition", brands[0], base_price, 4.9, "Top-rated bestseller with premium aerospace-grade materials, fastest response time, and 2-year warranty."),
+        (f"{brands[1]} {target_name} Ultra Performance", brands[1], round(base_price * 0.88, -1), 4.8, "High-performance edition engineered for durability, extended battery lifespan, and ergonomic comfort."),
+        (f"{brands[2]} {target_name} Neo Smart Edition", brands[2], round(base_price * 0.78, -1), 4.7, "Feature-packed everyday companion with smart AI optimization and quick-charge support."),
+        (f"{brands[3 % len(brands)]} {target_name} Essential Series", brands[3 % len(brands)], round(base_price * 0.65, -1), 4.5, "Maximum value-for-money option offering all core features at an unbeatable budget price."),
+        (f"{brands[4 % len(brands)]} {target_name} Compact Plus", brands[4 % len(brands)], round(base_price * 0.55, -1), 4.6, "Ultra-lightweight portable variant designed for on-the-go professionals and students."),
+        (f"{brands[5 % len(brands)]} {target_name} Studio Custom", brands[5 % len(brands)], round(base_price * 0.92, -1), 4.8, "Custom-tuned studio edition with enhanced precision engineering and VIP courier dispatch."),
     ]
 
     synth_results = []
-    for m_name, m_brand, m_price, m_rating in model_variants:
+    for m_name, m_brand, m_price, m_rating, m_desc in model_variants:
         synth_results.append({
             "name": m_name,
             "category": target_cat,
             "brand": m_brand.lower(),
             "price": float(m_price if m_price > 0 else 999.00),
-            "description": f"Premium quality {m_name} — engineered with high durability, rigorously tested, and backed by 1-year official warranty. Fast shipping available across India.",
+            "description": m_desc,
             "specifications": {
-                "build_quality": "High-Grade Certified Materials",
-                "features": f"Optimized {clean_keyword} performance with premium finish",
-                "warranty": "1 Year Official Manufacturer Warranty",
-                "dispatch": "Next-Day Priority Shipping (Select Cities)",
+                "grade": "Certified Grade-A Materials",
+                "features": f"Optimized {clean_keyword} architecture with premium finish",
+                "warranty": "1 Year Official Brand Warranty",
+                "dispatch": "Free 2-Day Priority Express Shipping",
             },
             "image_url": resolve_product_image(target_cat, m_name),
             "rating": m_rating,
-            "stock": 20,
+            "stock": 25,
             "in_stock": True,
         })
 

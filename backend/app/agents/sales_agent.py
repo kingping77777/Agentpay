@@ -77,16 +77,16 @@ class SalesAgent:
         if intent_type in ("search_products", "product_info"):
             if products:
                 budget_txt = f" within your ₹{budget:,.0f} budget" if budget > 0 else ""
-                res = f"🔍 Found {len(products)} great options{budget_txt}! Here are my top picks:\n\n"
-                for i, p in enumerate(products[:4], 1):
+                res = f"🎉 I found **{len(products)} matching options & recommended alternatives**{budget_txt}! Check out these top picks with full specs and instant checkout below:\n\n"
+                for i, p in enumerate(products[:6], 1):
                     specs = p.get("specifications") or {}
                     spec_highlights = []
                     for k, v in list(specs.items())[:3]:
                         spec_highlights.append(f"{k.replace('_', ' ').title()}: {v}")
                     spec_str = f"\n  📋 {' | '.join(spec_highlights)}" if spec_highlights else ""
 
-                    res += f"**{i}. {p['name']}** — ₹{p['price']:,.2f}\n  _{p.get('description', '')[:120]}_{spec_str}\n\n"
-                res += "💡 *Want to add any to your cart? Just say 'Add [product name] to cart'!*"
+                    res += f"**{i}. {p['name']}** — ₹{p['price']:,.2f}\n  _{p.get('description', '')[:130]}_{spec_str}\n\n"
+                res += "💡 *Tip: Click '⚡ BUY DIRECT' for instant 1-click UPI QR checkout with free 2-day delivery, or '🛒 ADD' to bundle items!*"
                 return res.strip()
             return "😅 I couldn't find exact matches for that. Try rephrasing — for example:\n• \"phone under 14k\"\n• \"running shoes below 3000\"\n• \"laptop under 50k\"\n\nI can search across phones, shoes, laptops, headphones, watches, fashion, and much more!"
         if intent_type == "add_to_cart":

@@ -254,18 +254,24 @@ export class OfficeScene extends Phaser.Scene {
     container.setDepth(50);
 
     const badge = this.add.graphics();
-    badge.fillStyle(0xfffdf5, 0.95);
-    badge.fillRoundedRect(0, 0, 135, 18, 3);
-    badge.lineStyle(1.5, 0x1a1320, 1);
-    badge.strokeRoundedRect(0, 0, 135, 18, 3);
+    // Drop shadow
+    badge.fillStyle(0x1a1320, 0.3);
+    badge.fillRoundedRect(2, 2, 160, 24, 4);
 
+    // Main background
+    badge.fillStyle(0xfffdf5, 1);
+    badge.fillRoundedRect(0, 0, 160, 24, 4);
+    badge.lineStyle(2, 0x1a1320, 1);
+    badge.strokeRoundedRect(0, 0, 160, 24, 4);
+
+    // Accent indicator
     badge.fillStyle(accent, 1);
-    badge.fillRect(3, 3, 4, 12);
+    badge.fillRect(4, 4, 5, 16);
     container.add(badge);
 
-    const t = this.add.text(12, 9, text, {
+    const t = this.add.text(14, 12, text, {
       fontFamily: 'monospace',
-      fontSize: '8px',
+      fontSize: '9.5px',
       fontStyle: 'bold',
       color: '#1A1320',
     }).setOrigin(0, 0.5);
@@ -331,11 +337,19 @@ export class OfficeScene extends Phaser.Scene {
     gfx.lineStyle(2, 0x1a1320, 1);
     gfx.strokeCircle(x, y + 26, 9);
 
-    const labelTxt = this.add.text(x, y - 24, label, {
+    // Clean desk badge
+    const badge = this.add.graphics();
+    this.furnitureObjects.push(badge);
+    badge.fillStyle(0xfffdf5, 0.95);
+    badge.fillRoundedRect(x - 48, y - 34, 96, 16, 3);
+    badge.lineStyle(1.5, 0x1a1320, 1);
+    badge.strokeRoundedRect(x - 48, y - 34, 96, 16, 3);
+
+    const labelTxt = this.add.text(x, y - 26, label, {
       fontFamily: 'monospace',
-      fontSize: '7px',
+      fontSize: '8px',
       fontStyle: 'bold',
-      color: '#3D2E4A',
+      color: '#1A1320',
     }).setOrigin(0.5);
     this.furnitureObjects.push(labelTxt);
   }
@@ -359,9 +373,17 @@ export class OfficeScene extends Phaser.Scene {
     gfx.fillStyle(0xffd93d, 1);
     gfx.fillCircle(x, y, 3.5);
 
-    const txt = this.add.text(x, y + 30, '🌐 LIVE WEB HUB', {
+    // Web Station Badge
+    const badge = this.add.graphics();
+    this.furnitureObjects.push(badge);
+    badge.fillStyle(0xfffdf5, 0.95);
+    badge.fillRoundedRect(x - 52, y + 26, 104, 17, 3);
+    badge.lineStyle(1.5, 0x1a1320, 1);
+    badge.strokeRoundedRect(x - 52, y + 26, 104, 17, 3);
+
+    const txt = this.add.text(x, y + 34, '🌐 LIVE WEB HUB', {
       fontFamily: 'monospace',
-      fontSize: '7.5px',
+      fontSize: '8.5px',
       fontStyle: 'bold',
       color: '#1A1320',
     }).setOrigin(0.5);
@@ -387,9 +409,17 @@ export class OfficeScene extends Phaser.Scene {
     gfx.lineStyle(1, 0x1a1320, 1);
     gfx.strokeRect(x + 6, y - 8, 14, 14);
 
-    const txt = this.add.text(x, y - 22, '💳 RAZORPAY POS', {
+    // Payment counter badge
+    const badge = this.add.graphics();
+    this.furnitureObjects.push(badge);
+    badge.fillStyle(0xfffdf5, 0.95);
+    badge.fillRoundedRect(x - 50, y - 34, 100, 16, 3);
+    badge.lineStyle(1.5, 0x1a1320, 1);
+    badge.strokeRoundedRect(x - 50, y - 34, 100, 16, 3);
+
+    const txt = this.add.text(x, y - 26, '💳 RAZORPAY POS', {
       fontFamily: 'monospace',
-      fontSize: '7.5px',
+      fontSize: '8px',
       fontStyle: 'bold',
       color: '#1A1320',
     }).setOrigin(0.5);
@@ -514,19 +544,21 @@ export class OfficeScene extends Phaser.Scene {
 
     container.add(gfx);
 
-    // Nameplate badge
+    // Nameplate badge with drop shadow
     const badge = this.add.graphics();
-    badge.fillStyle(0xfffdf5, 0.95);
-    badge.fillRoundedRect(-44, 22, 88, 15, 3);
+    badge.fillStyle(0x1a1320, 0.25);
+    badge.fillRoundedRect(-48, 24, 98, 19, 3);
+    badge.fillStyle(0xfffdf5, 1);
+    badge.fillRoundedRect(-50, 22, 100, 19, 3);
     badge.lineStyle(1.5, 0x1a1320, 1);
-    badge.strokeRoundedRect(-44, 22, 88, 15, 3);
+    badge.strokeRoundedRect(-50, 22, 100, 19, 3);
     badge.fillStyle(agent.accent, 1);
-    badge.fillRect(-40, 25, 5, 8);
+    badge.fillRect(-46, 25, 5, 13);
     container.add(badge);
 
-    const nameText = this.add.text(0, 30, agent.name, {
+    const nameText = this.add.text(0, 31.5, agent.name, {
       fontFamily: 'monospace',
-      fontSize: '7.5px',
+      fontSize: '8.5px',
       fontStyle: 'bold',
       color: '#1A1320',
     }).setOrigin(0.5);
@@ -536,33 +568,35 @@ export class OfficeScene extends Phaser.Scene {
     const emoteContainer = this.add.container(0, -28);
     const emoteBg = this.add.graphics();
     emoteBg.fillStyle(agent.accent, 1);
-    emoteBg.fillCircle(0, 0, 8);
+    emoteBg.fillCircle(0, 0, 9);
     emoteBg.lineStyle(1.5, 0x1a1320, 1);
-    emoteBg.strokeCircle(0, 0, 8);
-    const emoteText = this.add.text(0, 0, '⚡', { fontSize: '8px' }).setOrigin(0.5);
+    emoteBg.strokeCircle(0, 0, 9);
+    const emoteText = this.add.text(0, 0, '⚡', { fontSize: '9px' }).setOrigin(0.5);
     emoteContainer.add([emoteBg, emoteText]);
     emoteContainer.setVisible(false);
     container.add(emoteContainer);
     this.statusBadges[agent.id] = emoteContainer;
 
     // Speech bubble
-    const bubbleContainer = this.add.container(0, -50);
+    const bubbleContainer = this.add.container(0, -56);
     bubbleContainer.setVisible(false);
 
     const bubbleBg = this.add.graphics();
+    bubbleBg.fillStyle(0x1a1320, 0.2);
+    bubbleBg.fillRoundedRect(-93, -23, 190, 42, 5);
     bubbleBg.fillStyle(0xfffdf5, 1);
-    bubbleBg.fillRoundedRect(-85, -22, 170, 36, 4);
+    bubbleBg.fillRoundedRect(-95, -25, 190, 42, 5);
     bubbleBg.lineStyle(2, 0x1a1320, 1);
-    bubbleBg.strokeRoundedRect(-85, -22, 170, 36, 4);
+    bubbleBg.strokeRoundedRect(-95, -25, 190, 42, 5);
     bubbleBg.fillStyle(0xfffdf5, 1);
-    bubbleBg.fillTriangle(0, 18, -6, 13, 6, 13);
+    bubbleBg.fillTriangle(0, 22, -7, 16, 7, 16);
 
     const bubbleText = this.add.text(0, -4, '', {
       fontFamily: 'monospace',
-      fontSize: '8.5px',
+      fontSize: '9.5px',
       fontStyle: 'bold',
       color: '#1A1320',
-      wordWrap: { width: 155 },
+      wordWrap: { width: 175 },
       align: 'center',
     }).setOrigin(0.5);
 

@@ -136,6 +136,9 @@ class DirectBuyRequest(BaseModel):
     customer_id: str
     merchant_id: str
     product_id: str
+    product_name: str | None = None
+    product_price: float | None = None
+    product_category: str | None = "electronics"
     quantity: int = 1
     full_name: str
     street: str
@@ -149,28 +152,92 @@ class DirectBuyRequest(BaseModel):
 async def direct_buy_product(
     body: DirectBuyRequest,
     db: AsyncSession = Depends(get_db),
+    customer_id_override: str | None = None,
 ) -> dict:
-    """Create an instant direct order for a product with delivery address and UPI QR Code."""
+    """Create an instant direct order for any product with delivery address and UPI QR Code."""
     import urllib.parse
     from datetime import datetime, timedelta, timezone
-    from app.db.models import Order, OrderStatus, Product, Payment, PaymentStatus
+    from app.db.models import Order, OrderStatus, Product, Merchant, Customer
 
-    p_result = await db.execute(
-        select(Product).where(Product.id == uuid.UUID(body.product_id))
-    )
-    product = p_result.scalar_one_or_none()
+    product = None
+    try:
+        p_uuid = uuid.UUID(body.product_id)
+        p_result = await db.execute(
+            select(Product).where(Product.id == p_uuid)
+        )
+        product = p_result.scalar_one_or_none()
+    except Exception:
+        product = None
+
+    # Resolve or fallback merchant
+    m_uuid = None
+    try:
+        m_uuid = uuid.UUID(body.merchant_id)
+    except Exception:
+        m_res = await db.execute(select(Merchant).limit(1))
+        m_first = m_res.scalar_one_or_none()
+        m_uuid = m_first.id if m_first else uuid.uuid4()
+
+    # Resolve or fallback customer
+    c_uuid = None
+    try:
+        c_uuid = uuid.UUID(body.customer_id)
+    except Exception:
+        c_res = await db.execute(select(Customer).limit(1))
+        c_first = c_res.scalar_one_or_none()
+        c_uuid = c_first.id if c_first else uuid.uuid4()
+
     if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        # Create product on the fly
+        p_price = float(body.product_price) if body.product_price and body.product_price > 0 else 2499.00
+        p_name = body.product_name or "Verified AgentPay Product"
+        product = Product(
+            id=uuid.uuid4(),
+            merchant_id=m_uuid,
+            name=p_name,
+            category=body.product_category or "electronics",
+            brand="official",
+            description="Verified premium product via AgentPay Instant Commerce Network.",
+            price=p_price,
+            currency="INR",
+            sku=f"DIR-{uuid.uuid4().hex[:6].upper()}",
+            is_active=True,
+        )
+        db.add(product)
+        await db.flush()
 
     total_amount = float(product.price) * body.quantity
     order_id = uuid.uuid4()
     rzp_order_id = f"order_direct_{order_id.hex[:8]}"
 
+    # Create 1-click direct checkout Cart and CartItem
+    from app.db.models import Cart, CartItem, CartStatus
+    cart = Cart(
+        id=uuid.uuid4(),
+        customer_id=c_uuid,
+        merchant_id=m_uuid,
+        status=CartStatus.CHECKED_OUT,
+    )
+    db.add(cart)
+    await db.flush()
+
+    cart_item = CartItem(
+        id=uuid.uuid4(),
+        cart_id=cart.id,
+        product_id=product.id,
+        quantity=body.quantity,
+        unit_price=float(product.price),
+        final_price=total_amount,
+    )
+    db.add(cart_item)
+    await db.flush()
+
     # Create Order
     order = Order(
         id=order_id,
-        customer_id=uuid.UUID(body.customer_id),
-        merchant_id=uuid.UUID(body.merchant_id),
+        customer_id=c_uuid,
+        merchant_id=m_uuid,
+        cart_id=cart.id,
         amount=total_amount,
         currency="INR",
         status=OrderStatus.AUTHORIZED,
