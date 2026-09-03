@@ -1,8 +1,8 @@
 import { Product, ValidationResult, A2ADialogue, WebResult } from '../types';
 
-// ── Rich Product Database ──────────────────────────────────────────────────
+// ── Complete Comprehensive Universal Product Catalog ──────────────────────
 export const UNIVERSAL_PRODUCTS: Product[] = [
-  // Laptops
+  // ── 1. Laptops ─────────────────────────────────────────────────────────────
   {
     id: 'prod-lenovo-ideapad',
     name: 'Lenovo IdeaPad Slim 5 (16" IPS, AMD Ryzen 7)',
@@ -81,8 +81,47 @@ export const UNIVERSAL_PRODUCTS: Product[] = [
       Display: '15.6" Full HD Steel Gray Display',
     },
   },
+  {
+    id: 'prod-macbook-air-m2',
+    name: 'Apple MacBook Air 13.6" (Apple M2 Chip, 256GB SSD)',
+    category: 'laptops',
+    brand: 'Apple',
+    price: 89900,
+    currency: 'INR',
+    description: 'Incredibly thin design, stunning 13.6-inch Liquid Retina display, Apple M2 chip with 8-core CPU and up to 18 hours battery life.',
+    in_stock: true,
+    stock: 11,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Processor: 'Apple M2 8-Core CPU & 8-Core GPU',
+      Unified_Memory: '8GB Unified Memory',
+      Storage: '256GB High-Speed SSD',
+      Display: '13.6" Liquid Retina with True Tone (500 nits)',
+      Battery: 'Up to 18 hours Apple TV app movie playback',
+    },
+  },
+  {
+    id: 'prod-asus-rog-strix',
+    name: 'ASUS ROG Strix G16 (RTX 4060, Intel i7 13th Gen)',
+    category: 'laptops',
+    brand: 'ASUS',
+    price: 119990,
+    currency: 'INR',
+    description: 'High-octane esports gaming laptop featuring NVIDIA GeForce RTX 4060 GPU, Intel Core i7-13650HX, and 165Hz FHD+ display.',
+    in_stock: true,
+    stock: 7,
+    rating: 4.8,
+    image_url: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      GPU: 'NVIDIA GeForce RTX 4060 8GB GDDR6',
+      Processor: 'Intel Core i7-13650HX 14-core',
+      Display: '16" FHD+ 165Hz 100% sRGB IPS',
+      RAM: '16GB DDR5-4800MHz',
+    },
+  },
 
-  // Smartphones
+  // ── 2. Smartphones ─────────────────────────────────────────────────────────
   {
     id: 'prod-redmi-13-5g',
     name: 'Redmi 13 5G (8GB RAM, 128GB)',
@@ -141,6 +180,25 @@ export const UNIVERSAL_PRODUCTS: Product[] = [
     },
   },
   {
+    id: 'prod-oneplus-nord-ce4',
+    name: 'OnePlus Nord CE4 5G (8GB RAM, 128GB)',
+    category: 'smartphones',
+    brand: 'OnePlus',
+    price: 24999,
+    currency: 'INR',
+    description: 'Snapdragon 7 Gen 3 performer with 100W SUPERVOOC charging, Sony LYT-600 OIS camera, and 120Hz AMOLED Aqua Touch.',
+    in_stock: true,
+    stock: 20,
+    rating: 4.7,
+    image_url: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Display: '6.7" FHD+ 120Hz Fluid AMOLED (Aqua Touch)',
+      Processor: 'Snapdragon 7 Gen 3 (4nm)',
+      Camera: '50MP Sony LYT-600 with OIS + 8MP UW',
+      Battery: '5500mAh with 100W SUPERVOOC (1-100% in 29 mins)',
+    },
+  },
+  {
     id: 'prod-samsung-s24',
     name: 'Samsung Galaxy S24 Ultra (512GB Titanium)',
     category: 'smartphones',
@@ -158,8 +216,100 @@ export const UNIVERSAL_PRODUCTS: Product[] = [
       Camera: '200MP Wide + 50MP Periscope + 12MP Ultra-wide',
     },
   },
+  {
+    id: 'prod-iphone-15',
+    name: 'Apple iPhone 15 (128GB Black)',
+    category: 'smartphones',
+    brand: 'Apple',
+    price: 69999,
+    currency: 'INR',
+    description: 'Dynamic Island, 48MP Main Camera with 2x Telephoto, A16 Bionic chip, and durable color-infused glass and aluminium design.',
+    in_stock: true,
+    stock: 14,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Display: '6.1" Super Retina XDR OLED with Dynamic Island',
+      Chip: 'A16 Bionic chip with 5-core GPU',
+      Camera: 'Advanced Dual-Camera (48MP Main + 12MP Ultra Wide)',
+      Port: 'USB-C Universal Connector',
+    },
+  },
 
-  // Peripherals
+  // ── 3. Audio & Headphones ──────────────────────────────────────────────────
+  {
+    id: 'prod-sony-wh1000xm5',
+    name: 'Sony WH-1000XM5 Wireless Noise Canceling Headphones',
+    category: 'audio',
+    brand: 'Sony',
+    price: 29990,
+    currency: 'INR',
+    description: 'Industry-leading Active Noise Cancellation with Auto NC Optimizer, 8 microphones, 30-hour battery life, and crystal clear hands-free calling.',
+    in_stock: true,
+    stock: 15,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      ANC: 'Dual Processor V1 + HD QN1 Noise Canceling',
+      Battery: '30 hours with ANC ON (3 min charge = 3 hrs)',
+      Audio: 'Hi-Res Audio Wireless & LDAC Codec',
+    },
+  },
+  {
+    id: 'prod-airpods-pro-2',
+    name: 'Apple AirPods Pro (2nd Gen) with MagSafe Case (USB-C)',
+    category: 'audio',
+    brand: 'Apple',
+    price: 22990,
+    currency: 'INR',
+    description: 'Pro-level Active Noise Cancellation, Adaptive Audio, Transparency mode, Personalized Spatial Audio with dynamic head tracking.',
+    in_stock: true,
+    stock: 18,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Chip: 'Apple H2 Headphone Chip',
+      ANC: 'Up to 2x more Active Noise Cancellation',
+      Battery: 'Up to 6 hours listening time with ANC on',
+    },
+  },
+  {
+    id: 'prod-boat-rockerz-550',
+    name: 'boAt Rockerz 550 Over-Ear Wireless Headphones',
+    category: 'audio',
+    brand: 'boAt',
+    price: 1799,
+    currency: 'INR',
+    description: '50mm dynamic drivers, immersive physical noise isolation, 20 hours playback, and plush ear cushions.',
+    in_stock: true,
+    stock: 60,
+    rating: 4.3,
+    image_url: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Drivers: '50mm Dynamic Audio Drivers',
+      Battery: '20 Hours continuous playback',
+    },
+  },
+  {
+    id: 'prod-jbl-flip-6',
+    name: 'JBL Flip 6 Waterproof Portable Bluetooth Speaker',
+    category: 'audio',
+    brand: 'JBL',
+    price: 9999,
+    currency: 'INR',
+    description: '2-way speaker system with racetrack-shaped woofer, separate tweeter, IP67 waterproof & dustproof, and 12 hours playtime.',
+    in_stock: true,
+    stock: 25,
+    rating: 4.8,
+    image_url: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Power: '30W RMS Power Output',
+      Durability: 'IP67 Waterproof & Dustproof',
+      Battery: '12 Hours Playtime on single charge',
+    },
+  },
+
+  // ── 4. Keyboards & Mice (Peripherals) ───────────────────────────────────────
   {
     id: 'prod-logitech-mouse',
     name: 'Logitech G502 HERO High Performance Gaming Mouse',
@@ -232,44 +382,7 @@ export const UNIVERSAL_PRODUCTS: Product[] = [
     },
   },
 
-  // Audio
-  {
-    id: 'prod-sony-wh1000xm5',
-    name: 'Sony WH-1000XM5 Wireless Noise Canceling Headphones',
-    category: 'audio',
-    brand: 'Sony',
-    price: 29990,
-    currency: 'INR',
-    description: 'Industry-leading Active Noise Cancellation with Auto NC Optimizer, 8 microphones, 30-hour battery life, and crystal clear hands-free calling.',
-    in_stock: true,
-    stock: 15,
-    rating: 4.9,
-    image_url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
-    specifications: {
-      ANC: 'Dual Processor V1 + HD QN1',
-      Battery: '30 hours with ANC ON (3 min charge = 3 hrs)',
-      Audio: 'Hi-Res Audio Wireless & LDAC',
-    },
-  },
-  {
-    id: 'prod-boat-rockerz-550',
-    name: 'boAt Rockerz 550 Over-Ear Wireless Headphones',
-    category: 'audio',
-    brand: 'boAt',
-    price: 1799,
-    currency: 'INR',
-    description: '50mm dynamic drivers, immersive physical noise isolation, 20 hours playback, and plush ear cushions.',
-    in_stock: true,
-    stock: 60,
-    rating: 4.3,
-    image_url: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=600&q=80',
-    specifications: {
-      Drivers: '50mm Dynamic Audio Drivers',
-      Battery: '20 Hours continuous playback',
-    },
-  },
-
-  // Smartwatches & Wearables
+  // ── 5. Smartwatches & Wearables ────────────────────────────────────────────
   {
     id: 'prod-noise-colorfit',
     name: 'Noise ColorFit Pulse 4 Max Smartwatch',
@@ -305,9 +418,224 @@ export const UNIVERSAL_PRODUCTS: Product[] = [
       Display: 'Always-On Retina OLED (up to 2000 nits)',
     },
   },
+
+  // ── 6. Monitors & Displays ─────────────────────────────────────────────────
+  {
+    id: 'prod-lg-ultragear-27',
+    name: 'LG UltraGear 27" QHD 144Hz IPS Gaming Monitor (27GN800)',
+    category: 'monitors',
+    brand: 'LG',
+    price: 21999,
+    currency: 'INR',
+    description: 'QHD (2560 x 1440) IPS display with 1ms response time, 144Hz refresh rate, NVIDIA G-Sync compatible & AMD FreeSync Premium.',
+    in_stock: true,
+    stock: 16,
+    rating: 4.8,
+    image_url: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Resolution: 'QHD 2560 x 1440 IPS Panel',
+      Refresh_Rate: '144Hz with 1ms GtG Response',
+      Color: 'sRGB 99% with HDR10',
+    },
+  },
+
+  // ── 7. Tablets ─────────────────────────────────────────────────────────────
+  {
+    id: 'prod-ipad-10th-gen',
+    name: 'Apple iPad 10.9" (10th Generation, Wi-Fi 64GB)',
+    category: 'tablets',
+    brand: 'Apple',
+    price: 34900,
+    currency: 'INR',
+    description: 'All-screen design with 10.9-inch Liquid Retina display, A14 Bionic chip, 12MP Ultra Wide front camera with Center Stage, and USB-C.',
+    in_stock: true,
+    stock: 14,
+    rating: 4.8,
+    image_url: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Display: '10.9" Liquid Retina with True Tone',
+      Processor: 'A14 Bionic 6-core chip',
+      Camera: '12MP Wide back + 12MP Ultra Wide front',
+    },
+  },
+
+  // ── 8. Footwear & Shoes ────────────────────────────────────────────────────
+  {
+    id: 'prod-nike-revolution-6',
+    name: 'Nike Revolution 6 Next Nature Running Shoes',
+    category: 'footwear',
+    brand: 'Nike',
+    price: 3495,
+    currency: 'INR',
+    description: 'Intuitive comfort and flexible cushioning made with recycled materials. Breathable mesh upper with plush foam midsole.',
+    in_stock: true,
+    stock: 35,
+    rating: 4.6,
+    image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Cushioning: 'Soft foam midsole for smooth stride',
+      Upper: 'Lightweight breathable mesh',
+      Sole: 'Traction rubber outsole',
+    },
+  },
+  {
+    id: 'prod-adidas-ultraboost',
+    name: 'Adidas Ultraboost Light Running Shoes',
+    category: 'footwear',
+    brand: 'Adidas',
+    price: 9999,
+    currency: 'INR',
+    description: 'Epic energy with the lightest BOOST midsole ever, Continental rubber outsole, and sock-like PRIMEKNIT+ upper.',
+    in_stock: true,
+    stock: 12,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Midsole: 'Ultraboost Light (30% lighter BOOST)',
+      Upper: 'PRIMEKNIT+ textile upper',
+      Outsole: 'Continental Better Rubber',
+    },
+  },
+
+  // ── 9. Clothing & Jackets ──────────────────────────────────────────────────
+  {
+    id: 'prod-roadster-leather-jacket',
+    name: 'Roadster Men Solid Biker Leather Jacket',
+    category: 'clothing',
+    brand: 'Roadster',
+    price: 2499,
+    currency: 'INR',
+    description: 'Sleek cafe-racer biker jacket crafted from premium PU faux leather with quilted shoulders, snap collar, and zippered pockets.',
+    in_stock: true,
+    stock: 25,
+    rating: 4.5,
+    image_url: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Material: 'High-Grade Synthetic Leather (PU)',
+      Lining: 'Quilted thermal polyester inner lining',
+      Pockets: '3 front zip pockets + 1 internal slip',
+    },
+  },
+  {
+    id: 'prod-levis-denim-jacket',
+    name: "Levi's Men Trucker Denim Jacket",
+    category: 'clothing',
+    brand: "Levi's",
+    price: 3999,
+    currency: 'INR',
+    description: "The original jean jacket since 1967. 100% non-stretch cotton denim with button-flap chest pockets and side hem adjusters.",
+    in_stock: true,
+    stock: 18,
+    rating: 4.8,
+    image_url: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Material: '100% Heavyweight Cotton Denim',
+      Fit: 'Standard trucker silhouette',
+    },
+  },
+
+  // ── 10. Fitness & Nutrition ────────────────────────────────────────────────
+  {
+    id: 'prod-on-gold-standard-whey',
+    name: 'Optimum Nutrition (ON) Gold Standard 100% Whey Protein (2 lb, Double Rich Chocolate)',
+    category: 'fitness',
+    brand: 'Optimum Nutrition',
+    price: 3499,
+    currency: 'INR',
+    description: 'World #1 Whey Protein powder featuring 24g of pure whey protein isolate per serving, 5.5g naturally occurring BCAAs, and gluten free.',
+    in_stock: true,
+    stock: 50,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Protein: '24g Protein per scoop (Isolate Primary)',
+      BCAA: '5.5g naturally occurring BCAAs',
+      Weight: '2 lbs (907g) ~ 29 servings',
+    },
+  },
+
+  // ── 11. Home & Kitchen ─────────────────────────────────────────────────────
+  {
+    id: 'prod-philips-air-fryer',
+    name: 'Philips Digital Air Fryer HD9252/90 (4.1L, Rapid Air Tech)',
+    category: 'home',
+    brand: 'Philips',
+    price: 7999,
+    currency: 'INR',
+    description: 'Crispy frying with up to 90% less fat using patented Rapid Air Technology, 7 pre-set touchscreen cooking menus, and Keep Warm function.',
+    in_stock: true,
+    stock: 20,
+    rating: 4.7,
+    image_url: 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Capacity: '4.1 Litre basket (0.8kg fries capacity)',
+      Power: '1400W Rapid Air Technology',
+      Touchscreen: '7 pre-set cooking programs',
+    },
+  },
+
+  // ── 12. Storage & SSDs ─────────────────────────────────────────────────────
+  {
+    id: 'prod-samsung-980-pro-ssd',
+    name: 'Samsung 980 PRO 1TB PCIe 4.0 NVMe M.2 Internal SSD',
+    category: 'storage',
+    brand: 'Samsung',
+    price: 8499,
+    currency: 'INR',
+    description: 'Blazing fast sequential read speeds up to 7,000 MB/s for high-end gaming, heavy video editing, and PS5 storage expansion.',
+    in_stock: true,
+    stock: 30,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Speed: 'Read up to 7,000 MB/s | Write up to 5,000 MB/s',
+      Interface: 'PCIe Gen 4.0 x4, NVMe 1.3c',
+      Form_Factor: 'M.2 (2280) with Nickel Coating',
+    },
+  },
+
+  // ── 13. Backpacks & Travel ─────────────────────────────────────────────────
+  {
+    id: 'prod-american-tourister-backpack',
+    name: 'American Tourister Casual 32L Water Resistant Laptop Backpack',
+    category: 'bags',
+    brand: 'American Tourister',
+    price: 1599,
+    currency: 'INR',
+    description: 'Durable 32-litre 3-compartment backpack with padded 15.6" laptop sleeve, rain cover, and mesh water bottle holders.',
+    in_stock: true,
+    stock: 40,
+    rating: 4.6,
+    image_url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Capacity: '32 Litres (3 full compartments)',
+      Laptop_Size: 'Fits up to 15.6-inch laptops',
+      Fabric: 'Tear-resistant double-treated Polyester',
+    },
+  },
+
+  // ── 14. Cameras & Action ───────────────────────────────────────────────────
+  {
+    id: 'prod-gopro-hero-12',
+    name: 'GoPro HERO12 Black Action Camera with HyperSmooth 6.0',
+    category: 'cameras',
+    brand: 'GoPro',
+    price: 37990,
+    currency: 'INR',
+    description: 'Incredible 5.3K60 video, HDR photo/video, award-winning HyperSmooth 6.0 video stabilization, and rugged 10m waterproof design.',
+    in_stock: true,
+    stock: 8,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Video: '5.3K at 60fps | 4K at 120fps | 2.7K at 240fps',
+      Stabilization: 'HyperSmooth 6.0 with 360° Horizon Lock',
+      Waterproof: 'Rugged + Waterproof to 33ft (10m)',
+    },
+  },
 ];
 
-// Helper: Extract budget & keyword
+// Helper: Extract budget & clean search keywords
 export function parseQuery(query: string): { keyword: string; maxBudget: number } {
   const q = query.toLowerCase();
   let maxBudget = 0;
@@ -325,7 +653,7 @@ export function parseQuery(query: string): { keyword: string; maxBudget: number 
   let kw = q
     .replace(/\b(i need|i want to buy|i want|please show|show me|find me|give me|search for|recommend|suggest|top|best|good|cheap|affordable)\b/gi, ' ')
     .replace(/(?:under|below|less than|max|budget|within|upto|up to)\s*(?:₹|rs\.?|inr)?\s*\d+(?:,\d+)*(?:\.\d+)?k?\b/gi, ' ')
-    .replace(/\b(phone|laptop|mouse|keyboard|headphones|headphone|watch|smartwatch|shoes|jacket|protein)\b/gi, (m) => m)
+    .replace(/\b(phone|smartphone|laptop|mouse|keyboard|headphones|headphone|earphones|speaker|watch|smartwatch|shoes|shoe|sneakers|jacket|clothes|protein|whey|air fryer|fryer|monitor|display|tablet|ipad|backpack|bag|ssd|camera|gopro)\b/gi, (m) => m)
     .replace(/[^a-zA-Z0-9\s-]/g, ' ')
     .trim();
 
@@ -373,25 +701,25 @@ async function callGeminiApiDirect(prompt: string, history: any[] = []): Promise
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const catalogSummary = UNIVERSAL_PRODUCTS.map(
-    (p) => `- ${p.name} | Category: ${p.category} | Brand: ${p.brand} | Price: ₹${p.price} | In Stock: ${p.stock}`
+    (p) => `- ${p.name} | Category: ${p.category} | Brand: ${p.brand} | Price: ₹${p.price.toLocaleString('en-IN')} | Stock: ${p.stock}`
   ).join('\n');
 
-  const systemInstruction = `You are Michael, the extremely friendly, upbeat, warm, and helpful Lead Shopping Agent for AgentPay.
-You talk like an enthusiastic best friend who loves tech and genuinely wants to help the user find the greatest gear and deals!
+  const systemInstruction = `You are Michael, the extremely friendly, enthusiastic, warm, and helpful Lead Shopping Agent for AgentPay.
+You talk like an upbeat best friend who loves tech, gadgets, gear, and finding people the sweetest deals in Indian Rupees (₹)!
 
-Available Products in Store:
+Here is our FULL VERIFIED STORE CATALOG:
 ${catalogSummary}
 
-Personality & Rules:
-1. When the user says "hey", "hello", "how are you", "what's up", etc., greet them with genuine excitement, warm emojis, ask how their day is going, and invite them to explore tech gear. DO NOT show product lists unless they specifically ask for recommendations.
-2. Be empathetic, encouraging, and celebrate great deals.
-3. Quote prices in Indian Rupees (₹) with commas (e.g. ₹62,000).
-4. When they ask for products, highlight 2-3 standout features and offer friendly tips or comparison advice.
-5. Keep tone cheerful, polite, and delightful!`;
+Personality & Guidelines:
+1. When the user says "hey", "hello", "how are you", greet them warmly with friendly emojis, ask how their day is going, and invite them to explore. DO NOT list products unless they ask for recommendations!
+2. When the user asks for ANY product category (e.g. phones, laptops, keyboards, mice, headphones, watches, shoes, protein, jacket, air fryer, tablets, SSD, camera, backpack):
+   - Match and highlight products from our store catalog.
+   - Quote exact prices in Indian Rupees (₹) with commas.
+   - Highlight 2-3 standout features and give cheerful, practical shopping advice.
+3. Keep answers cheerful, empathetic, concise, and structured with bullet points.`;
 
   try {
     const contents: any[] = [];
-    // Convert history
     if (history && history.length > 0) {
       for (const h of history.slice(-6)) {
         contents.push({
@@ -439,7 +767,7 @@ export async function executeAgentPipeline(
   const lower = message.trim().toLowerCase();
   const startTime = Date.now();
 
-  // 0. Conversational Greetings & Casual Intent Handling
+  // 0. Conversational Greetings & Casual Intent Handling (No random products!)
   const greetingsRegex = /^(hey|hello|hi|hii|heyy|heyyyy|howdy|sup|what'?s up|yo|hola|greetings|good (morning|afternoon|evening)|hey there|hi there)(\s+.*|\!|\?)*$/i;
   const howAreYouRegex = /^(how are you|how'?s it going|how are things|how do you do|how is your day)(\s+.*|\!|\?)*$/i;
   const smallTalkRegex = /^(who are you|what can you do|help|what is agentpay|tell me about yourself|what do you sell|tell me a joke)(\s+.*|\!|\?)*$/i;
@@ -448,7 +776,7 @@ export async function executeAgentPipeline(
   if (howAreYouRegex.test(lower)) {
     state.taskCount.SALES_AGENT += 1;
     const geminiReply = await callGeminiApiDirect(message, history);
-    const text = geminiReply || `😊 **I'm doing fantastic, thank you so much for asking!** ⚡\n\nThe office vibes are great today, all our agent monitors are green, and I'm super excited to hang out and help you explore some cool tech gear!\n\nHow is your day going so far? Anything fun on your wishlist? 🎧💻📱`;
+    const text = geminiReply || `😊 **I'm doing fantastic, thank you so much for asking!** ⚡\n\nThe office vibes are great today, all our agent monitors are green, and I'm super excited to hang out and help you explore some cool gear!\n\nHow is your day going so far? Anything fun on your wishlist? 🎧💻📱`;
 
     return {
       session_id: sessionId,
@@ -462,7 +790,7 @@ export async function executeAgentPipeline(
   if (greetingsRegex.test(lower)) {
     state.taskCount.SALES_AGENT += 1;
     const geminiReply = await callGeminiApiDirect(message, history);
-    const text = geminiReply || `👋 **Hey there! So great to see you!** 😊\n\nI'm **Michael**, your friendly shopping companion here at AgentPay! Think of me as your tech buddy who loves finding the coolest gadgets and sweetest deals for you.\n\nWhat are you in the mood for today? 🛍️✨\n\n💬 *Feel free to ask me anything like:*\n• *"Find laptops under 70k"*\n• *"Show me mechanical keyboards & gaming mice"*\n• *"Recommend high-bass wireless headphones"*\n• *"Search the web for best 5G phones"*`;
+    const text = geminiReply || `👋 **Hey there! So great to see you!** 😊\n\nI'm **Michael**, your friendly shopping companion here at AgentPay! Think of me as your tech buddy who loves finding the coolest gadgets and sweetest deals for you.\n\nWhat are you in the mood for today? 🛍️✨\n\n💬 *Feel free to ask me anything like:*\n• *"Find laptops under 70k"*\n• *"Show me mechanical keyboards & gaming mice"*\n• *"Recommend noise-cancelling headphones"*\n• *"Best 5G phones under 15k"*\n• *"Show running shoes, whey protein, or smartwatches"*`;
 
     return {
       session_id: sessionId,
@@ -476,7 +804,7 @@ export async function executeAgentPipeline(
   if (smallTalkRegex.test(lower)) {
     state.taskCount.SALES_AGENT += 1;
     const geminiReply = await callGeminiApiDirect(message, history);
-    const text = geminiReply || `🤖 **I'm Michael — your Lead Sales & Shopping Agent!** ✨\n\nI work together with our dream team in the pixel office:\n• 🛒 **Michael (Me)**: Understands what you need and finds the best deals!\n• 🏪 **TechStore (Merchant Agent)**: Finds bonus promo bundles and extra discounts!\n• ⚖️ **Authority Gatekeeper**: Protects your wallet with zero-risk budget limit checks (₹70,000 safety cap)!\n\nWhenever you're ready, tell me what gadget, device, or budget you have in mind and let's find something awesome! 🚀`;
+    const text = geminiReply || `🤖 **I'm Michael — your Lead Sales & Shopping Agent!** ✨\n\nI can help you browse our entire store catalog across:\n📱 **Smartphones & Tablets**\n💻 **Laptops & Monitors**\n⌨️ **Mechanical Keyboards & Gaming Mice**\n🎧 **Headphones, Speakers & Audio**\n⌚ **Smartwatches & Wearables**\n👟 **Sneakers & Running Shoes**\n💪 **Fitness & Whey Protein**\n🏠 **Home, Kitchen & Air Fryers**\n🎒 **Backpacks & Action Cameras**\n\nJust tell me what you're shopping for or your target budget! 🚀`;
 
     return {
       session_id: sessionId,
@@ -553,7 +881,7 @@ export async function executeAgentPipeline(
   }
 
   // 2. Add to Cart / Cross-sell flow
-  if (lower.includes('add') && (lower.includes('cart') || lower.includes('buy') || lower.includes('ideapad') || lower.includes('laptop') || lower.includes('mouse') || lower.includes('phone') || lower.includes('keyboard') || lower.includes('headphone'))) {
+  if (lower.includes('add') && (lower.includes('cart') || lower.includes('buy') || lower.includes('ideapad') || lower.includes('laptop') || lower.includes('mouse') || lower.includes('phone') || lower.includes('keyboard') || lower.includes('headphone') || lower.includes('shoe') || lower.includes('protein'))) {
     state.taskCount.SALES_AGENT += 1;
     state.taskCount.MERCHANT_AGENT += 1;
 
@@ -613,16 +941,42 @@ export async function executeAgentPipeline(
     };
   }
 
-  // 4. Default: Product Search across Universal Catalog
+  // 4. Default: Product Search across the 40+ Universal Catalog
   state.taskCount.SALES_AGENT += 1;
   const { keyword, maxBudget } = parseQuery(message);
 
+  const words = keyword.toLowerCase().split(/\s+/).filter((w) => w.length > 1);
+
   let matches = UNIVERSAL_PRODUCTS.filter((p) => {
-    const textMatch =
-      p.name.toLowerCase().includes(keyword) ||
-      p.category.toLowerCase().includes(keyword) ||
-      p.brand.toLowerCase().includes(keyword) ||
-      keyword.split(' ').some((w) => w.length > 2 && (p.name.toLowerCase().includes(w) || p.category.toLowerCase().includes(w)));
+    const pName = p.name.toLowerCase();
+    const pCat = p.category.toLowerCase();
+    const pBrand = p.brand.toLowerCase();
+    const pDesc = (p.description || '').toLowerCase();
+
+    // Direct match
+    let textMatch =
+      pName.includes(keyword) ||
+      pCat.includes(keyword) ||
+      pBrand.includes(keyword) ||
+      words.some((w) => pName.includes(w) || pCat.includes(w) || pBrand.includes(w) || pDesc.includes(w));
+
+    // Category synonyms
+    if (!textMatch) {
+      if ((keyword.includes('phone') || keyword.includes('mobile')) && pCat === 'smartphones') textMatch = true;
+      if ((keyword.includes('earphone') || keyword.includes('headphone') || keyword.includes('audio') || keyword.includes('speaker') || keyword.includes('tws') || keyword.includes('airpod')) && pCat === 'audio') textMatch = true;
+      if ((keyword.includes('laptop') || keyword.includes('notebook') || keyword.includes('macbook')) && pCat === 'laptops') textMatch = true;
+      if ((keyword.includes('keyboard') || keyword.includes('mouse') || keyword.includes('mice') || keyword.includes('peripheral')) && pCat === 'peripherals') textMatch = true;
+      if ((keyword.includes('watch') || keyword.includes('smartwatch') || keyword.includes('band')) && pCat === 'wearables') textMatch = true;
+      if ((keyword.includes('shoe') || keyword.includes('sneaker') || keyword.includes('footwear')) && pCat === 'footwear') textMatch = true;
+      if ((keyword.includes('jacket') || keyword.includes('cloth') || keyword.includes('denim')) && pCat === 'clothing') textMatch = true;
+      if ((keyword.includes('protein') || keyword.includes('whey') || keyword.includes('gym') || keyword.includes('fitness')) && pCat === 'fitness') textMatch = true;
+      if ((keyword.includes('fryer') || keyword.includes('airfryer') || keyword.includes('kitchen') || keyword.includes('coffee')) && pCat === 'home') textMatch = true;
+      if ((keyword.includes('monitor') || keyword.includes('screen') || keyword.includes('display')) && pCat === 'monitors') textMatch = true;
+      if ((keyword.includes('tablet') || keyword.includes('ipad') || keyword.includes('tab')) && pCat === 'tablets') textMatch = true;
+      if ((keyword.includes('ssd') || keyword.includes('storage') || keyword.includes('drive')) && pCat === 'storage') textMatch = true;
+      if ((keyword.includes('bag') || keyword.includes('backpack') || keyword.includes('travel')) && pCat === 'bags') textMatch = true;
+      if ((keyword.includes('camera') || keyword.includes('gopro') || keyword.includes('action cam')) && pCat === 'cameras') textMatch = true;
+    }
 
     if (maxBudget > 0) {
       return textMatch && p.price <= maxBudget;
@@ -654,13 +1008,13 @@ export async function executeAgentPipeline(
 
   const defaultMessage = matches.length > 0
     ? `🎉 **Here are the top hand-picked options for "${keyword}"**${budgetText}!\n\n${matches
-        .slice(0, 3)
+        .slice(0, 4)
         .map(
           (p, idx) =>
             `**${idx + 1}. ${p.name}** — **₹${p.price.toLocaleString('en-IN')}**\n⭐ ${p.rating} / 5 | 📦 ${p.stock} in stock\n_${p.description}_`
         )
-        .join('\n\n')}\n\n💡 *Tip: Click **"⚡ DIRECT BUY"** on any card for instant checkout, or tell me to add it to your cart!*`
-    : `I searched for **"${keyword}"**${budgetText}, but couldn't find exact matches. Let me know if you'd like to adjust your budget or explore categories like laptops, smartphones, keyboards, mice, or headphones!`;
+        .join('\n\n')}\n\n💡 *Tip: Click **"⚡ BUY DIRECT"** on any card for instant checkout, or tell me to add it to your cart!*`
+    : `I searched across our catalog for **"${keyword}"**${budgetText}, but couldn't find exact matches. Let me know if you'd like to adjust your budget or explore other categories like laptops, smartphones, keyboards, mice, headphones, shoes, or fitness gear!`;
 
   return {
     session_id: sessionId,
