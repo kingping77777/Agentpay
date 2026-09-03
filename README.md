@@ -207,6 +207,26 @@ Navigate your browser to:
 
 ---
 
+## 🚀 Deploying to Vercel
+
+The project is fully pre-configured for one-click deployment on [Vercel](https://vercel.com/):
+
+### Option A: Via Vercel Dashboard (GitHub Import)
+1. Push your code to GitHub:
+   ```bash
+   git push origin main
+   ```
+2. In the [Vercel Dashboard](https://vercel.com/new), select **Import Repository**.
+3. Vercel will automatically detect the settings from [`vercel.json`](file:///c:/Users/Daksh/OneDrive/Desktop/Hackathon/vercel.json):
+   - **Framework Preset**: `Vite`
+   - **Build Command**: `npm --prefix frontend install && npm --prefix frontend run build` (or `npm run build` if Root Directory is `frontend`)
+   - **Output Directory**: `frontend/dist` (or `dist` if Root Directory is `frontend`)
+4. *(Optional)* In **Environment Variables**, add:
+   - `VITE_API_BASE_URL`: The URL of your deployed backend (e.g. `https://your-backend.onrender.com` or `https://your-backend.railway.app`).
+5. Click **Deploy**! 🚀
+
+---
+
 ## 🎯 Pre-Seeded Demo Scenarios
 
 | Scenario | Action / User Prompt | Expected Agent Behavior |

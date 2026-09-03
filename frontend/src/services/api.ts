@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = ''; // Uses relative URLs with Vite proxy in dev & root serving in prod
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
 
 export const api = axios.create({
   baseURL: API_BASE,
