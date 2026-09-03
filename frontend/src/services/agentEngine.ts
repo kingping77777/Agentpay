@@ -364,15 +364,125 @@ function getSessionState(sessionId: string): LocalSessionState {
   return sessions[sessionId];
 }
 
+// ── Direct Google Gemini API Caller ─────────────────────────────────────────
+async function callGeminiApiDirect(prompt: string, history: any[] = []): Promise<string | null> {
+  const apiKey = localStorage.getItem('agentpay_gemini_api_key') || (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+  if (!apiKey || apiKey.startsWith('AQ.')) return null;
+
+  const model = localStorage.getItem('agentpay_gemini_model') || 'gemini-2.0-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  const catalogSummary = UNIVERSAL_PRODUCTS.map(
+    (p) => `- ${p.name} | Category: ${p.category} | Brand: ${p.brand} | Price: ₹${p.price} | In Stock: ${p.stock}`
+  ).join('\n');
+
+  const systemInstruction = `You are Michael, the friendly, enthusiastic Lead Sales Discovery Agent for AgentPay (an autonomous AI commerce platform).
+Available Products in Store:
+${catalogSummary}
+
+Rules:
+1. If the user says hello/greetings ("hey", "hi", "how are you"), be friendly, warm, and ask what tech or gear they're shopping for today. DO NOT list products unless they ask for them!
+2. If they ask for product recommendations, find matching products from the store or recommend based on budget in INR (₹).
+3. If they ask about orders/checkout, explain that they can add to cart or click Direct Buy.
+4. Keep answers friendly, conversational, concise with emojis.`;
+
+  try {
+    const contents: any[] = [];
+    // Convert history
+    if (history && history.length > 0) {
+      for (const h of history.slice(-6)) {
+        contents.push({
+          role: h.role === 'model' ? 'model' : 'user',
+          parts: [{ text: h.content || '' }],
+        });
+      }
+    }
+    contents.push({ role: 'user', parts: [{ text: prompt }] });
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents,
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 600,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn('Gemini API returned status:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    return candidateText || null;
+  } catch (err) {
+    console.warn('Direct Gemini API call failed, falling back to local brain:', err);
+    return null;
+  }
+}
+
 // ── Client-Side Intelligent Multi-Agent Engine ──────────────────────────────
 export async function executeAgentPipeline(
   sessionId: string,
   message: string,
-  _history: any[] = []
+  history: any[] = []
 ): Promise<any> {
   const state = getSessionState(sessionId);
-  const lower = message.toLowerCase();
+  const lower = message.trim().toLowerCase();
   const startTime = Date.now();
+
+  // 0. Conversational Greetings & Casual Intent Handling (No random products!)
+  const greetingsRegex = /^(hey|hello|hi|hii|heyy|howdy|sup|what'?s up|good (morning|afternoon|evening)|yo|hola|greetings)(\s+.*|\!|\?)*$/i;
+  const smallTalkRegex = /^(how are you|who are you|what can you do|help|what is agentpay|tell me about yourself|what do you sell)(\s+.*|\!|\?)*$/i;
+  const courtesyRegex = /^(thanks|thank you|thx|awesome|cool|great|ok|okay|got it|nice|bye|goodbye)(\s+.*|\!|\?)*$/i;
+
+  if (greetingsRegex.test(lower)) {
+    state.taskCount.SALES_AGENT += 1;
+    // Try Gemini if configured
+    const geminiReply = await callGeminiApiDirect(message, history);
+    const text = geminiReply || `👋 **Hey there!** I'm **Michael**, your AI Shopping Assistant here at AgentPay!\n\nI can help you search the catalog, compare specs, check for bundle discounts, and guide you through secure checkout.\n\nWhat are you shopping for today? 🛍️\n\n💡 *Try asking:*\n• *"Show me laptops under 70000"*\n• *"Find mechanical keyboards and gaming mice"*\n• *"Recommend noise-cancelling headphones"*\n• *"Best 5G phones under 15k"*`;
+
+    return {
+      session_id: sessionId,
+      agent: 'SALES_AGENT',
+      message: text,
+      products: [], // No products for greetings!
+      duration_ms: Date.now() - startTime,
+    };
+  }
+
+  if (smallTalkRegex.test(lower)) {
+    state.taskCount.SALES_AGENT += 1;
+    const geminiReply = await callGeminiApiDirect(message, history);
+    const text = geminiReply || `🤖 **I'm Michael — Lead Sales Discovery Agent!**\n\nI work alongside:\n• 🏪 **TechStore Merchant Agent**: Offers live inventory & bundle discounts\n• ⚖️ **Authority Gatekeeper Agent**: Deterministically verifies safety & budget caps (₹70,000 cap)\n\nI can help you find smartphones, laptops, audio gear, mechanical keyboards, gaming mice, smartwatches, and much more.\n\nJust tell me what you're looking for or your budget! ✨`;
+
+    return {
+      session_id: sessionId,
+      agent: 'SALES_AGENT',
+      message: text,
+      products: [],
+      duration_ms: Date.now() - startTime,
+    };
+  }
+
+  if (courtesyRegex.test(lower)) {
+    state.taskCount.SALES_AGENT += 1;
+    const geminiReply = await callGeminiApiDirect(message, history);
+    const text = geminiReply || `You're very welcome! 😊 Let me know whenever you want to explore more tech gear, add items to cart, or proceed to checkout!`;
+
+    return {
+      session_id: sessionId,
+      agent: 'SALES_AGENT',
+      message: text,
+      products: [],
+      duration_ms: Date.now() - startTime,
+    };
+  }
 
   // 1. Direct Checkout / Proceed to checkout
   if (lower.includes('checkout') || lower.includes('proceed to pay') || lower.includes('buy now') || lower.includes('place order')) {
@@ -426,7 +536,7 @@ export async function executeAgentPipeline(
   }
 
   // 2. Add to Cart / Cross-sell flow
-  if (lower.includes('add') && (lower.includes('cart') || lower.includes('buy') || lower.includes('ideapad') || lower.includes('laptop') || lower.includes('mouse') || lower.includes('phone'))) {
+  if (lower.includes('add') && (lower.includes('cart') || lower.includes('buy') || lower.includes('ideapad') || lower.includes('laptop') || lower.includes('mouse') || lower.includes('phone') || lower.includes('keyboard') || lower.includes('headphone'))) {
     state.taskCount.SALES_AGENT += 1;
     state.taskCount.MERCHANT_AGENT += 1;
 
@@ -507,15 +617,11 @@ export async function executeAgentPipeline(
   if (matches.length === 0) {
     if (maxBudget > 0) {
       matches = UNIVERSAL_PRODUCTS.filter((p) => p.price <= maxBudget);
-    } else {
-      matches = UNIVERSAL_PRODUCTS.slice(0, 3);
     }
   }
 
-  // If still empty, return top items
-  if (matches.length === 0) {
-    matches = UNIVERSAL_PRODUCTS.slice(0, 3);
-  }
+  // Check if Gemini can provide a personalized direct response
+  const geminiReply = await callGeminiApiDirect(message, history);
 
   const budgetText = maxBudget > 0 ? ` under ₹${maxBudget.toLocaleString('en-IN')}` : '';
 
@@ -529,16 +635,20 @@ export async function executeAgentPipeline(
     created_at: new Date().toISOString(),
   });
 
+  const defaultMessage = matches.length > 0
+    ? `✨ Here are the top verified products matching **"${keyword}"**${budgetText}:\n\n${matches
+        .slice(0, 3)
+        .map(
+          (p, idx) =>
+            `**${idx + 1}. ${p.name}** — **₹${p.price.toLocaleString('en-IN')}**\n⭐ ${p.rating} / 5 | 📦 ${p.stock} in stock\n_${p.description}_`
+        )
+        .join('\n\n')}\n\n💡 *Tip: Click **"⚡ DIRECT BUY"** on any card for instant checkout, or tell me to add it to your cart!*`
+    : `I searched for **"${keyword}"**${budgetText}, but couldn't find exact matches. Let me know if you'd like to adjust your budget or explore categories like laptops, smartphones, keyboards, mice, or headphones!`;
+
   return {
     session_id: sessionId,
     agent: 'SALES_AGENT',
-    message: `✨ Here are the top verified products matching **"${keyword}"**${budgetText}:\n\n${matches
-      .slice(0, 3)
-      .map(
-        (p, idx) =>
-          `**${idx + 1}. ${p.name}** — **₹${p.price.toLocaleString('en-IN')}**\n⭐ ${p.rating} / 5 | 📦 ${p.stock} in stock\n_${p.description}_`
-      )
-      .join('\n\n')}\n\n💡 *Tip: Click **"⚡ DIRECT BUY"** on any card for instant checkout, or tell me to add it to your cart!*`,
+    message: geminiReply || defaultMessage,
     products: matches.slice(0, 4),
     duration_ms: Date.now() - startTime,
   };
@@ -552,7 +662,7 @@ export function getLocalTelemetry(sessionId?: string) {
       {
         id: 'sales_agent',
         name: 'SALES AGENT',
-        model: 'Gemini-2.0-Flash',
+        model: localStorage.getItem('agentpay_gemini_model') || 'Gemini-2.0-Flash',
         focus: 'Customer Discovery',
         status: 'online',
         tasks: state.taskCount.SALES_AGENT,
@@ -562,7 +672,7 @@ export function getLocalTelemetry(sessionId?: string) {
       {
         id: 'merchant_agent',
         name: 'MERCHANT AGENT',
-        model: 'Gemini-2.0-Flash',
+        model: localStorage.getItem('agentpay_gemini_model') || 'Gemini-2.0-Flash',
         focus: 'Promotions & Upsells',
         status: 'online',
         tasks: state.taskCount.MERCHANT_AGENT,
@@ -571,7 +681,7 @@ export function getLocalTelemetry(sessionId?: string) {
       {
         id: 'authority_agent',
         name: 'AUTHORITY AGENT',
-        model: 'Gemini-2.0-Flash',
+        model: localStorage.getItem('agentpay_gemini_model') || 'Gemini-2.0-Flash',
         focus: 'Deterministic Policy',
         status: 'active',
         tasks: state.taskCount.AUTHORITY_AGENT,
