@@ -251,6 +251,25 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                               className="p-3 bg-[#FFFDF5] border-2 border-[#1A1320] shadow-[2px_2px_0_rgba(26,19,32,0.2)] flex flex-col justify-between hover:bg-[#FFF8E7] transition-all"
                             >
                               <div>
+                                {/* Product Image Header */}
+                                {p.image_url ? (
+                                  <div className="w-full h-28 mb-2 bg-[#F4E9C7] border-2 border-[#1A1320] overflow-hidden relative group">
+                                    <img
+                                      src={p.image_url}
+                                      alt={p.name}
+                                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                                      loading="lazy"
+                                      onError={(e) => {
+                                        // Fallback on image load error
+                                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=80';
+                                      }}
+                                    />
+                                    <span className="absolute top-1 right-1 px-1.5 py-0.5 bg-[#1A1320]/80 text-[#FFFDF5] font-display text-[7px] border border-[#FFFDF5]">
+                                      {p.brand.toUpperCase()}
+                                    </span>
+                                  </div>
+                                ) : null}
+
                                 <div className="flex items-start justify-between gap-1">
                                   <div className="font-pixel font-bold text-[14px] text-[#1A1320] line-clamp-2">
                                     {p.name}

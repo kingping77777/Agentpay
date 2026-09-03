@@ -194,20 +194,35 @@ export const App: React.FC = () => {
     }
   };
 
+  const [isFullFrameOffice, setIsFullFrameOffice] = useState(false);
+
   return (
     <div className="w-screen h-screen flex flex-col bg-[#1A1320] text-[#1A1320] overflow-hidden font-pixel">
       {/* 1. Top Header Bar */}
       <TopBar sessionId={sessionId} onMemoryReplay={handleMemoryReplay} />
 
-      {/* 2. Main Middle Workspace (Split: Left Phaser 2D Office | Right React Command Center) */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-[#FFF8E7]">
+      {/* 2. Main Middle Workspace (Split or Full-Frame 2D Office) */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-[#FFF8E7] relative">
         {/* Left: 2D Pixel Office Canvas */}
-        <div className="w-full lg:w-[54%] h-1/2 lg:h-full relative">
-          <PhaserOffice currentAgent={currentAgent} lastMessage={lastMessage} />
+        <div
+          className={`h-full transition-all duration-300 relative ${
+            isFullFrameOffice ? 'w-full' : 'w-full lg:w-[54%] h-1/2 lg:h-full'
+          }`}
+        >
+          <PhaserOffice
+            currentAgent={currentAgent}
+            lastMessage={lastMessage}
+            isFullFrame={isFullFrameOffice}
+            onToggleFullFrame={() => setIsFullFrameOffice(!isFullFrameOffice)}
+          />
         </div>
 
         {/* Right: Command Center Terminal & Chat Stream */}
-        <div className="w-full lg:w-[46%] h-1/2 lg:h-full">
+        <div
+          className={`h-full transition-all duration-300 ${
+            isFullFrameOffice ? 'hidden' : 'w-full lg:w-[46%] h-1/2 lg:h-full'
+          }`}
+        >
           <CommandCenter
             messages={messages}
             currentAgent={currentAgent}
@@ -223,7 +238,11 @@ export const App: React.FC = () => {
       </div>
 
       {/* 3. Bottom Telemetry Bar */}
-      <BottomTelemetryBar statusData={statusData} />
+      <BottomTelemetryBar
+        statusData={statusData}
+        onQuickPrompt={handleSendMessage}
+        onOpenAuditModal={handleMemoryReplay}
+      />
 
       {/* 4. Direct 1-Click Checkout Modal with UPI QR Code */}
       <DirectCheckoutModal

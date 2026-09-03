@@ -638,6 +638,54 @@ def synthesize_products_for_query(raw_query: str) -> list[dict]:
     elif any(w in lower_keyword for w in ["keyboard", "mouse", "gaming keyboard", "mechanical keyboard", "wireless mouse", "mousepad"]):
         matched_domain = "keyboard"
 
+CATEGORY_IMAGE_MAP: dict[str, str] = {
+    "smartphones": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&auto=format&fit=crop&q=80",
+    "phone": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&auto=format&fit=crop&q=80",
+    "laptops": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&auto=format&fit=crop&q=80",
+    "audio": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=80",
+    "wearables": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=80",
+    "footwear": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=80",
+    "clothing": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&auto=format&fit=crop&q=80",
+    "fitness": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop&q=80",
+    "kitchen": "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=500&auto=format&fit=crop&q=80",
+    "furniture": "https://images.unsplash.com/photo-1580481077198-ac826f634571?w=500&auto=format&fit=crop&q=80",
+    "bags": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=80",
+    "gaming": "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=500&auto=format&fit=crop&q=80",
+    "cameras": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500&auto=format&fit=crop&q=80",
+    "electronics": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&auto=format&fit=crop&q=80",
+    "beauty": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&auto=format&fit=crop&q=80",
+    "stationery": "https://images.unsplash.com/photo-1585336261026-0043c7b642ff?w=500&auto=format&fit=crop&q=80",
+    "toys": "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=500&auto=format&fit=crop&q=80",
+    "automotive": "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=500&auto=format&fit=crop&q=80",
+    "sports": "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=500&auto=format&fit=crop&q=80",
+    "books": "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=500&auto=format&fit=crop&q=80",
+    "consumer_goods": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=80",
+}
+
+def resolve_product_image(cat: str, name: str) -> str:
+    lower = f"{cat} {name}".lower()
+    if any(k in lower for k in ["phone", "redmi", "realme", "galaxy", "iphone", "oneplus", "poco"]):
+        return CATEGORY_IMAGE_MAP["smartphones"]
+    if any(k in lower for k in ["laptop", "macbook", "aspire", "ideapad", "vivobook"]):
+        return CATEGORY_IMAGE_MAP["laptops"]
+    if any(k in lower for k in ["headphone", "earbud", "audio", "boat", "sony", "jbl", "speaker"]):
+        return CATEGORY_IMAGE_MAP["audio"]
+    if any(k in lower for k in ["watch", "smartwatch", "fitness", "band", "fire-boltt", "noise"]):
+        return CATEGORY_IMAGE_MAP["wearables"]
+    if any(k in lower for k in ["shoe", "sneaker", "running", "nike", "puma", "adidas"]):
+        return CATEGORY_IMAGE_MAP["footwear"]
+    if any(k in lower for k in ["jacket", "hoodie", "shirt", "clothing", "dress", "leather"]):
+        return CATEGORY_IMAGE_MAP["clothing"]
+    if any(k in lower for k in ["protein", "whey", "creatine", "supplement"]):
+        return CATEGORY_IMAGE_MAP["fitness"]
+    if any(k in lower for k in ["coffee", "espresso", "maker", "kettle"]):
+        return CATEGORY_IMAGE_MAP["kitchen"]
+    if any(k in lower for k in ["chair", "desk", "furniture", "table"]):
+        return CATEGORY_IMAGE_MAP["furniture"]
+    if any(k in lower for k in ["bag", "backpack", "rucksack", "tourister", "wildcraft"]):
+        return CATEGORY_IMAGE_MAP["bags"]
+    return CATEGORY_IMAGE_MAP.get(cat, CATEGORY_IMAGE_MAP["consumer_goods"])
+
     if matched_domain and matched_domain in CATALOG_KNOWLEDGE:
         domain_info = CATALOG_KNOWLEDGE[matched_domain]
         matching_products = []
@@ -647,13 +695,16 @@ def synthesize_products_for_query(raw_query: str) -> list[dict]:
             if user_budget <= 0 or user_budget >= tier["max_budget"] or tier == domain_info["tiers"][0]:
                 for item in tier["items"]:
                     if user_budget <= 0 or item["price"] <= (user_budget * 1.05):
+                        p_cat = domain_info["category"]
+                        p_name = item["name"]
                         matching_products.append({
-                            "name": item["name"],
-                            "category": domain_info["category"],
+                            "name": p_name,
+                            "category": p_cat,
                             "brand": item["brand"],
                             "price": float(item["price"]),
                             "description": item["description"],
                             "specifications": item["specifications"],
+                            "image_url": item.get("image_url") or resolve_product_image(p_cat, p_name),
                             "rating": 4.8,
                             "stock": 15,
                             "in_stock": True,
@@ -663,7 +714,6 @@ def synthesize_products_for_query(raw_query: str) -> list[dict]:
             return matching_products[:4]
 
     # 2. Universal Smart Fallback Generator for any arbitrary product term
-    # Provides intelligent branded alternatives even for products not in the knowledge base
     target_name = clean_keyword.title() if clean_keyword else "Premium Tech Item"
     target_cat = "consumer_goods"
 
@@ -724,6 +774,7 @@ def synthesize_products_for_query(raw_query: str) -> list[dict]:
                 "warranty": "1 Year Official Manufacturer Warranty",
                 "dispatch": "Next-Day Priority Shipping (Select Cities)",
             },
+            "image_url": resolve_product_image(target_cat, m_name),
             "rating": m_rating,
             "stock": 20,
             "in_stock": True,

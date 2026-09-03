@@ -670,11 +670,31 @@ async def seed() -> None:
         # 4. Insert Catalog Products and Inventory
         created_products = []
         for p_data in PRODUCTS:
+            cat = p_data["category"]
+            p_name = p_data["name"]
+            
+            # Category image resolution map
+            img_map = {
+                "laptops": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&auto=format&fit=crop&q=80",
+                "smartphones": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&auto=format&fit=crop&q=80",
+                "headphones": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=80",
+                "audio": "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=500&auto=format&fit=crop&q=80",
+                "wearables": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=80",
+                "monitors": "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&auto=format&fit=crop&q=80",
+                "keyboards": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&auto=format&fit=crop&q=80",
+                "cameras": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500&auto=format&fit=crop&q=80",
+                "gaming": "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=500&auto=format&fit=crop&q=80",
+                "components": "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80",
+                "tablets": "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&auto=format&fit=crop&q=80",
+                "accessories": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=80",
+            }
+            img_url = p_data.get("image_url") or img_map.get(cat, "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=80")
+
             product = Product(
                 id=uuid.uuid4(),
                 merchant_id=merchant.id,
-                name=p_data["name"],
-                category=p_data["category"],
+                name=p_name,
+                category=cat,
                 brand=p_data["brand"],
                 description=p_data["description"],
                 price=p_data["price"],
@@ -682,6 +702,7 @@ async def seed() -> None:
                 sku=p_data["sku"],
                 specifications=p_data["specifications"],
                 rating=p_data["rating"],
+                image_url=img_url,
                 is_active=True,
             )
             session.add(product)
