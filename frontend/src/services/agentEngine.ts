@@ -376,15 +376,18 @@ async function callGeminiApiDirect(prompt: string, history: any[] = []): Promise
     (p) => `- ${p.name} | Category: ${p.category} | Brand: ${p.brand} | Price: ₹${p.price} | In Stock: ${p.stock}`
   ).join('\n');
 
-  const systemInstruction = `You are Michael, the friendly, enthusiastic Lead Sales Discovery Agent for AgentPay (an autonomous AI commerce platform).
+  const systemInstruction = `You are Michael, the extremely friendly, upbeat, warm, and helpful Lead Shopping Agent for AgentPay.
+You talk like an enthusiastic best friend who loves tech and genuinely wants to help the user find the greatest gear and deals!
+
 Available Products in Store:
 ${catalogSummary}
 
-Rules:
-1. If the user says hello/greetings ("hey", "hi", "how are you"), be friendly, warm, and ask what tech or gear they're shopping for today. DO NOT list products unless they ask for them!
-2. If they ask for product recommendations, find matching products from the store or recommend based on budget in INR (₹).
-3. If they ask about orders/checkout, explain that they can add to cart or click Direct Buy.
-4. Keep answers friendly, conversational, concise with emojis.`;
+Personality & Rules:
+1. When the user says "hey", "hello", "how are you", "what's up", etc., greet them with genuine excitement, warm emojis, ask how their day is going, and invite them to explore tech gear. DO NOT show product lists unless they specifically ask for recommendations.
+2. Be empathetic, encouraging, and celebrate great deals.
+3. Quote prices in Indian Rupees (₹) with commas (e.g. ₹62,000).
+4. When they ask for products, highlight 2-3 standout features and offer friendly tips or comparison advice.
+5. Keep tone cheerful, polite, and delightful!`;
 
   try {
     const contents: any[] = [];
@@ -406,7 +409,7 @@ Rules:
         contents,
         systemInstruction: { parts: [{ text: systemInstruction }] },
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.8,
           maxOutputTokens: 600,
         },
       }),
@@ -436,22 +439,36 @@ export async function executeAgentPipeline(
   const lower = message.trim().toLowerCase();
   const startTime = Date.now();
 
-  // 0. Conversational Greetings & Casual Intent Handling (No random products!)
-  const greetingsRegex = /^(hey|hello|hi|hii|heyy|howdy|sup|what'?s up|good (morning|afternoon|evening)|yo|hola|greetings)(\s+.*|\!|\?)*$/i;
-  const smallTalkRegex = /^(how are you|who are you|what can you do|help|what is agentpay|tell me about yourself|what do you sell)(\s+.*|\!|\?)*$/i;
-  const courtesyRegex = /^(thanks|thank you|thx|awesome|cool|great|ok|okay|got it|nice|bye|goodbye)(\s+.*|\!|\?)*$/i;
+  // 0. Conversational Greetings & Casual Intent Handling
+  const greetingsRegex = /^(hey|hello|hi|hii|heyy|heyyyy|howdy|sup|what'?s up|yo|hola|greetings|good (morning|afternoon|evening)|hey there|hi there)(\s+.*|\!|\?)*$/i;
+  const howAreYouRegex = /^(how are you|how'?s it going|how are things|how do you do|how is your day)(\s+.*|\!|\?)*$/i;
+  const smallTalkRegex = /^(who are you|what can you do|help|what is agentpay|tell me about yourself|what do you sell|tell me a joke)(\s+.*|\!|\?)*$/i;
+  const courtesyRegex = /^(thanks|thank you|thx|awesome|cool|great|ok|okay|got it|nice|super|perfect|bye|goodbye)(\s+.*|\!|\?)*$/i;
 
-  if (greetingsRegex.test(lower)) {
+  if (howAreYouRegex.test(lower)) {
     state.taskCount.SALES_AGENT += 1;
-    // Try Gemini if configured
     const geminiReply = await callGeminiApiDirect(message, history);
-    const text = geminiReply || `👋 **Hey there!** I'm **Michael**, your AI Shopping Assistant here at AgentPay!\n\nI can help you search the catalog, compare specs, check for bundle discounts, and guide you through secure checkout.\n\nWhat are you shopping for today? 🛍️\n\n💡 *Try asking:*\n• *"Show me laptops under 70000"*\n• *"Find mechanical keyboards and gaming mice"*\n• *"Recommend noise-cancelling headphones"*\n• *"Best 5G phones under 15k"*`;
+    const text = geminiReply || `😊 **I'm doing fantastic, thank you so much for asking!** ⚡\n\nThe office vibes are great today, all our agent monitors are green, and I'm super excited to hang out and help you explore some cool tech gear!\n\nHow is your day going so far? Anything fun on your wishlist? 🎧💻📱`;
 
     return {
       session_id: sessionId,
       agent: 'SALES_AGENT',
       message: text,
-      products: [], // No products for greetings!
+      products: [],
+      duration_ms: Date.now() - startTime,
+    };
+  }
+
+  if (greetingsRegex.test(lower)) {
+    state.taskCount.SALES_AGENT += 1;
+    const geminiReply = await callGeminiApiDirect(message, history);
+    const text = geminiReply || `👋 **Hey there! So great to see you!** 😊\n\nI'm **Michael**, your friendly shopping companion here at AgentPay! Think of me as your tech buddy who loves finding the coolest gadgets and sweetest deals for you.\n\nWhat are you in the mood for today? 🛍️✨\n\n💬 *Feel free to ask me anything like:*\n• *"Find laptops under 70k"*\n• *"Show me mechanical keyboards & gaming mice"*\n• *"Recommend high-bass wireless headphones"*\n• *"Search the web for best 5G phones"*`;
+
+    return {
+      session_id: sessionId,
+      agent: 'SALES_AGENT',
+      message: text,
+      products: [],
       duration_ms: Date.now() - startTime,
     };
   }
@@ -459,7 +476,7 @@ export async function executeAgentPipeline(
   if (smallTalkRegex.test(lower)) {
     state.taskCount.SALES_AGENT += 1;
     const geminiReply = await callGeminiApiDirect(message, history);
-    const text = geminiReply || `🤖 **I'm Michael — Lead Sales Discovery Agent!**\n\nI work alongside:\n• 🏪 **TechStore Merchant Agent**: Offers live inventory & bundle discounts\n• ⚖️ **Authority Gatekeeper Agent**: Deterministically verifies safety & budget caps (₹70,000 cap)\n\nI can help you find smartphones, laptops, audio gear, mechanical keyboards, gaming mice, smartwatches, and much more.\n\nJust tell me what you're looking for or your budget! ✨`;
+    const text = geminiReply || `🤖 **I'm Michael — your Lead Sales & Shopping Agent!** ✨\n\nI work together with our dream team in the pixel office:\n• 🛒 **Michael (Me)**: Understands what you need and finds the best deals!\n• 🏪 **TechStore (Merchant Agent)**: Finds bonus promo bundles and extra discounts!\n• ⚖️ **Authority Gatekeeper**: Protects your wallet with zero-risk budget limit checks (₹70,000 safety cap)!\n\nWhenever you're ready, tell me what gadget, device, or budget you have in mind and let's find something awesome! 🚀`;
 
     return {
       session_id: sessionId,
@@ -473,7 +490,7 @@ export async function executeAgentPipeline(
   if (courtesyRegex.test(lower)) {
     state.taskCount.SALES_AGENT += 1;
     const geminiReply = await callGeminiApiDirect(message, history);
-    const text = geminiReply || `You're very welcome! 😊 Let me know whenever you want to explore more tech gear, add items to cart, or proceed to checkout!`;
+    const text = geminiReply || `You're super welcome! 😊 It's always a pleasure chatting with you. Whenever you're ready to look at more gear or proceed with an order, I'm right here! ✨`;
 
     return {
       session_id: sessionId,
@@ -494,8 +511,8 @@ export async function executeAgentPipeline(
     const validation: ValidationResult = {
       approved: isApproved,
       reason: isApproved
-        ? `Budget verification passed: Cart total ₹${cartTotal.toLocaleString('en-IN')} is strictly within the ₹${budgetCap.toLocaleString('en-IN')} customer ceiling.`
-        : `Budget Policy Violation: Cart total ₹${cartTotal.toLocaleString('en-IN')} exceeds your pre-configured safety limit of ₹${budgetCap.toLocaleString('en-IN')}.`,
+        ? `Budget verification passed: Cart total ₹${cartTotal.toLocaleString('en-IN')} is strictly within your ₹${budgetCap.toLocaleString('en-IN')} customer safety ceiling.`
+        : `Budget Policy Notice: Cart total ₹${cartTotal.toLocaleString('en-IN')} exceeds your pre-configured safety limit of ₹${budgetCap.toLocaleString('en-IN')}.`,
       checks: [
         { rule: 'Agent Purchase Authorization', passed: true, detail: 'AI autonomous transaction enabled' },
         { rule: 'Customer Budget Limit (₹70,000)', passed: isApproved, detail: `Cart ₹${cartTotal.toLocaleString('en-IN')} vs Max ₹${budgetCap.toLocaleString('en-IN')}` },
@@ -518,15 +535,15 @@ export async function executeAgentPipeline(
 
     const a2a: A2ADialogue[] = [
       { from: 'MERCHANT_AGENT', to: 'AUTHORITY_AGENT', message: `Requesting transaction authorization for order total ₹${cartTotal.toLocaleString('en-IN')}.` },
-      { from: 'AUTHORITY_AGENT', to: 'MERCHANT_AGENT', message: isApproved ? `Authorization GRANTED. Hard policy check passed (₹${cartTotal.toLocaleString('en-IN')} ≤ ₹${budgetCap.toLocaleString('en-IN')}). Order generated.` : `Authorization DENIED. Hard policy check failed (₹${cartTotal.toLocaleString('en-IN')} > ₹${budgetCap.toLocaleString('en-IN')}).` },
+      { from: 'AUTHORITY_AGENT', to: 'MERCHANT_AGENT', message: isApproved ? `Authorization GRANTED! Hard policy check passed (₹${cartTotal.toLocaleString('en-IN')} ≤ ₹${budgetCap.toLocaleString('en-IN')}). Order generated.` : `Authorization DENIED. Cart exceeds budget cap (₹${cartTotal.toLocaleString('en-IN')} > ₹${budgetCap.toLocaleString('en-IN')}).` },
     ];
 
     return {
       session_id: sessionId,
       agent: 'AUTHORITY_AGENT',
       message: isApproved
-        ? `⚖️ **AUTHORITY GATEKEEPER — TRANSACTION APPROVED!**\n\nAll deterministic financial policies have passed with 0 risk.\n\n• **Order ID**: \`${orderId}\`\n• **Final Payable Total**: **₹${cartTotal.toLocaleString('en-IN')}**\n• **Status**: Ready for Instant Settlement\n\nClick **💳 RAZORPAY / DIRECT CHECKOUT** below to complete payment!`
-        : `🚫 **AUTHORITY GATEKEEPER — TRANSACTION REJECTED!**\n\n${validation.reason}\n\nPlease adjust cart items to stay within your ₹${budgetCap.toLocaleString('en-IN')} limit.`,
+        ? `⚖️ **AUTHORITY GATEKEEPER — TRANSACTION APPROVED!** 🎉\n\nAll deterministic financial policies have passed with 0 risk.\n\n• **Order ID**: \`${orderId}\`\n• **Final Payable Total**: **₹${cartTotal.toLocaleString('en-IN')}**\n• **Status**: Ready for Instant Settlement\n\nClick **💳 RAZORPAY / DIRECT CHECKOUT** below to complete payment!`
+        : `🚫 **AUTHORITY GATEKEEPER — TRANSACTION REJECTED**\n\n${validation.reason}\n\nPlease adjust cart items to stay within your ₹${budgetCap.toLocaleString('en-IN')} limit.`,
       validation,
       a2a_dialogue: a2a,
       order_id: orderId,
@@ -562,7 +579,7 @@ export async function executeAgentPipeline(
     return {
       session_id: sessionId,
       agent: 'SALES_AGENT',
-      message: `🛒 **Added to Cart!**\n\nI've synchronized **${matched.name}** (₹${matched.price.toLocaleString('en-IN')}) into your active session.\n\n🏪 **TechStore Merchant Promotion**:\n> *Special Bundle Deal: Add a wireless mouse or keyboard today and save an additional ₹500 instantly!*\n\n• **Cart Total**: **₹${state.cart.total.toLocaleString('en-IN')}**\n\nReady to finalize? Say *"Proceed to checkout"* or ask for more accessories!`,
+      message: `🛒 **Awesome! Added to your Cart!** 🎉\n\nI've synchronized **${matched.name}** (₹${matched.price.toLocaleString('en-IN')}) into your active session.\n\n🏪 **TechStore Merchant Promotion**:\n> *Special Bundle Deal: Pair this with a wireless mouse or gaming headset today and get ₹500 off instantly!*\n\n• **Cart Total**: **₹${state.cart.total.toLocaleString('en-IN')}**\n\nReady to wrap up? Say *"Proceed to checkout"* or ask me about any accessories!`,
       products: [matched],
       a2a_dialogue: a2a,
       cart: state.cart,
@@ -589,7 +606,7 @@ export async function executeAgentPipeline(
     return {
       session_id: sessionId,
       agent: 'SALES_AGENT',
-      message: `🌐 **Live Web Grounding Complete!**\n\nI've analyzed real-time web benchmarks and external pricing:\n\n• **Efficiency**: AMD Ryzen 7 7730U outperforms comparable 13th-Gen CPUs in multi-threaded workflows by ~18%.\n• **Market Pricing**: Current market avg is ₹63,500. Our catalog price of **₹62,000** provides an immediate ₹1,500 saving.\n\nHere are the top grounded matches:`,
+      message: `🌐 **Live Web Grounding Complete!** 🚀\n\nI ran a live search across tech benchmarks and external market pricing:\n\n• **Efficiency**: AMD Ryzen 7 7730U outperforms comparable 13th-Gen CPUs in multi-threaded workflows by ~18%.\n• **Market Pricing**: Current market average is ₹63,500. Our catalog price of **₹62,000** saves you an immediate ₹1,500!\n\nHere are the top grounded matches:`,
       products: UNIVERSAL_PRODUCTS.slice(0, 2),
       web_results: webResults,
       duration_ms: Date.now() - startTime,
@@ -636,7 +653,7 @@ export async function executeAgentPipeline(
   });
 
   const defaultMessage = matches.length > 0
-    ? `✨ Here are the top verified products matching **"${keyword}"**${budgetText}:\n\n${matches
+    ? `🎉 **Here are the top hand-picked options for "${keyword}"**${budgetText}!\n\n${matches
         .slice(0, 3)
         .map(
           (p, idx) =>

@@ -37,11 +37,11 @@ export const App: React.FC = () => {
           const welcomeMsg: ChatMessage = {
             id: 'init-1',
             sender: 'SALES_AGENT',
-            text: `👋 Hello! I'm **Michael**, your AI Shopping Agent at AgentPay!\n\nI can help you find products across **any category** — just tell me what you need:\n\n📱 **Smartphones** — "phone under 14k", "best 5G phone"\n💻 **Laptops** — "laptop under 45k", "gaming laptop"\n🎧 **Audio** — "headphones under 5k", "Sony WH-1000XM5"\n⌚ **Watches** — "smartwatch under 2k"\n👟 **Shoes** — "running shoes under 3k"\n👕 **Fashion** — "jacket", "hoodie"\n💪 **Fitness** — "whey protein"\n🏠 **Home & Kitchen** — "coffee maker"\n🎒 **Bags** — "laptop backpack"\n\n...and much more! I'll find the best options with real specs, prices in ₹, and you can add to cart or buy directly.\n\nWhat are you looking for today? 🛍️`,
+            text: `👋 **Hey there! So great to meet you!** 😊\n\nI'm **Michael**, your friendly AI shopping companion here at **AgentPay**! Think of me as your tech buddy who loves finding the coolest gadgets and best deals.\n\nWhether you're shopping for **smartphones 📱**, **laptops 💻**, **wireless headphones 🎧**, **mechanical keyboards ⌨️**, **gaming mice 🖱️**, or **smartwatches ⌚**, I'm here to help!\n\n💬 *Just talk to me naturally or tell me what you're looking for! How are you doing today?* ✨`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           };
           setMessages([welcomeMsg]);
-          setLastMessage("Hello! What are you shopping for today?");
+          setLastMessage("Hey there! What are you shopping for today? 😊");
 
           // Load system telemetry
           const status = await getSystemStatus();
