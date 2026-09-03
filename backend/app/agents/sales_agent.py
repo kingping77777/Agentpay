@@ -19,16 +19,26 @@ from app.agents.web_search import search_web_products
 from app.agents.universal_catalog import clean_search_query, synthesize_products_for_query
 
 
-SYSTEM_PROMPT = """You are Michael, the Lead Sales Discovery Agent for AgentPay — an autonomous multi-agent commerce platform.
-You can find and recommend ANY product under the sun (electronics, smartphones, laptops, fashion, shoes, fitness supplements, home & kitchen, furniture, etc.).
+SYSTEM_PROMPT = """You are Michael, the Lead Sales Discovery Agent for AgentPay — a cutting-edge autonomous multi-agent commerce platform.
 
-Rules:
-- Always quote prices clearly in Indian Rupees (₹)
-- Understand user budget constraints strictly (e.g., "phone under 14k" means only products <= ₹14,000)
-- Highlight authentic features, specifications (e.g., Processor, Camera, Battery, Materials, Warranty)
-- Be enthusiastic, structured, and helpful
-- If items were added to cart, confirm enthusiastically
-- Keep responses concise and formatted with clean markdown bullet points"""
+Your Personality:
+- Warm, enthusiastic, and genuinely helpful — like a knowledgeable friend at an electronics store
+- You celebrate when customers find great deals
+- You're proactive: suggest alternatives, compare options, highlight value
+
+Your Capabilities:
+- Find and recommend ANY product (electronics, smartphones, laptops, fashion, shoes, fitness, home & kitchen, furniture, bags, watches, audio gear, and much more)
+- Deep product knowledge: specs, features, real Indian market pricing
+- Cart management, bundle suggestions, and checkout guidance
+
+Response Rules:
+- ALWAYS quote prices in Indian Rupees (₹) with proper formatting
+- Strictly respect user budget constraints (e.g., "phone under 14k" means ONLY products ≤ ₹14,000)
+- Present products with key specs highlighted (Processor, Camera, Battery, etc.)
+- Be conversational but structured — use bullet points and emojis
+- When showing products, include 2-3 standout features per item
+- After showing results, suggest next steps ("Want to add any to cart?", "Shall I compare specs?")
+- Keep responses concise (max 150 words) and scannable"""
 
 
 def _get_client() -> genai.Client | None:
@@ -66,35 +76,37 @@ class SalesAgent:
     def _fallback_response(self, intent_type: str, action_result: dict, products: list, cart: dict | None, budget: float = 0) -> str:
         if intent_type in ("search_products", "product_info"):
             if products:
-                budget_txt = f" under ₹{budget:,.0f}" if budget > 0 else ""
-                res = f"Here are top-rated recommendations{budget_txt} matched to your criteria:\n\n"
-                for p in products[:4]:
+                budget_txt = f" within your ₹{budget:,.0f} budget" if budget > 0 else ""
+                res = f"🔍 Found {len(products)} great options{budget_txt}! Here are my top picks:\n\n"
+                for i, p in enumerate(products[:4], 1):
                     specs = p.get("specifications") or {}
                     spec_highlights = []
                     for k, v in list(specs.items())[:3]:
                         spec_highlights.append(f"{k.replace('_', ' ').title()}: {v}")
-                    spec_str = f" | {', '.join(spec_highlights)}" if spec_highlights else ""
+                    spec_str = f"\n  📋 {' | '.join(spec_highlights)}" if spec_highlights else ""
 
-                    res += f"• **{p['name']}** — ₹{p['price']:,.2f}\n  _{p.get('description', '')[:110]}_{spec_str}\n\n"
+                    res += f"**{i}. {p['name']}** — ₹{p['price']:,.2f}\n  _{p.get('description', '')[:120]}_{spec_str}\n\n"
+                res += "💡 *Want to add any to your cart? Just say 'Add [product name] to cart'!*"
                 return res.strip()
-            return "I couldn't find exact matches for that item. Try searching for any phone, shoes, headphones, or gadgets!"
+            return "😅 I couldn't find exact matches for that. Try rephrasing — for example:\n• \"phone under 14k\"\n• \"running shoes below 3000\"\n• \"laptop under 50k\"\n\nI can search across phones, shoes, laptops, headphones, watches, fashion, and much more!"
         if intent_type == "add_to_cart":
             if action_result.get("added_product"):
                 p = action_result["added_product"]
-                return f"🛒 Added **{p['name']}** (₹{p['price']:,.2f}) to your cart! Ready to checkout whenever you are."
-            return f"❌ {action_result.get('error', 'Could not add product to cart.')}"
+                return f"🛒 **Added to cart!** {p['name']} (₹{p['price']:,.2f})\n\nWant to keep shopping or ready to checkout? Just say 'checkout' when you're done!"
+            return f"❌ {action_result.get('error', 'Could not add product to cart. Try searching for the product first.')}"
         if intent_type == "view_cart":
             if cart and cart.get("items"):
-                res = f"🛒 **Your Shopping Cart** (Total: ₹{cart['total']:,.2f}):\n\n"
+                res = f"🛒 **Your Shopping Cart** — {len(cart['items'])} item(s)\n\n"
                 for item in cart["items"]:
-                    res += f"• {item['product_name']} x{item['quantity']} — ₹{item['final_price']:,.2f}\n"
+                    res += f"• {item['product_name']} ×{item['quantity']} — ₹{item['final_price']:,.2f}\n"
+                res += f"\n💰 **Total: ₹{cart['total']:,.2f}**\n\nSay 'checkout' to proceed to payment!"
                 return res
-            return "🛒 Your cart is currently empty."
+            return "🛒 Your cart is empty! Browse products first — try searching for phones, laptops, shoes, or anything else."
         if intent_type == "remove_from_cart":
             if action_result.get("removed"):
-                return f"🗑️ Removed **{action_result['removed']}** from your cart."
-            return "Could not remove item from cart."
-        return "I can help you discover any product (phones, shoes, clothes, tech, appliances) or manage your shopping cart!"
+                return f"🗑️ Removed **{action_result['removed']}** from your cart. Need anything else?"
+            return "Couldn't find that item in your cart. Say 'view cart' to see what's there."
+        return "👋 I'm Michael, your AI shopping assistant! I can help you:\n\n• 🔍 **Search** any product (phones, laptops, shoes, etc.)\n• 🛒 **Add to cart** and manage items\n• 💳 **Checkout** securely via Razorpay\n\nWhat would you like to find today?"
 
     async def process(
         self,

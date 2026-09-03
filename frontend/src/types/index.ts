@@ -11,6 +11,8 @@ export interface Product {
   in_stock: boolean;
   stock: number;
   image_url?: string;
+  rating?: number;
+  specifications?: Record<string, string>;
 }
 
 export interface PolicyCheck {

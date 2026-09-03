@@ -257,13 +257,35 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                                   </div>
                                   <Package className="w-4 h-4 text-[#4ECDC4] shrink-0" />
                                 </div>
-                                <div className="font-display text-[8px] text-[#6B5878] mt-1">
-                                  {p.brand.toUpperCase()} • {p.category.toUpperCase()}
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="font-display text-[8px] text-[#6B5878]">
+                                    {p.brand.toUpperCase()} • {p.category.toUpperCase()}
+                                  </span>
+                                  {p.rating && (
+                                    <span className="font-display text-[8px] text-[#FFD93D]">
+                                      {'★'.repeat(Math.floor(p.rating))} {p.rating}
+                                    </span>
+                                  )}
+                                  {p.in_stock && (
+                                    <span className="font-display text-[7px] text-[#6BCF7F] bg-[#E8F8EA] px-1 border border-[#6BCF7F]">
+                                      IN STOCK
+                                    </span>
+                                  )}
                                 </div>
                                 {p.description && (
                                   <p className="font-pixel text-[12px] text-[#6B5878] line-clamp-2 mt-1">
                                     {p.description}
                                   </p>
+                                )}
+                                {/* Key Specs Pills */}
+                                {p.specifications && (
+                                  <div className="flex flex-wrap gap-1 mt-1.5">
+                                    {Object.entries(p.specifications).slice(0, 3).map(([key, val]) => (
+                                      <span key={key} className="font-display text-[7px] text-[#3D2E4A] bg-[#F4E9C7] px-1.5 py-0.5 border border-[#D9CFE0]">
+                                        {String(val).slice(0, 40)}
+                                      </span>
+                                    ))}
+                                  </div>
                                 )}
                               </div>
 
@@ -339,11 +361,18 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               })}
 
               {isLoading && (
-                <div className="p-3 bg-[#FFF8E7] border-2 border-[#1A1320] shadow-[2px_2px_0_rgba(26,19,32,0.2)] flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 bg-[#FFD93D] border border-[#1A1320] animate-spin" />
-                  <span className="font-display text-[9px] text-[#1A1320]">
-                    Agents negotiating and executing workflow...
-                  </span>
+                <div className="p-3 bg-[#FFF8E7] border-2 border-[#1A1320] shadow-[2px_2px_0_rgba(26,19,32,0.2)] space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-[#FFD93D] border border-[#1A1320] animate-spin" />
+                    <span className="font-display text-[9px] text-[#1A1320] font-bold">
+                      AGENTS WORKING
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 ml-4">
+                    <span className="font-pixel text-[12px] text-[#4ECDC4]">🔍 Michael searching...</span>
+                    <span className="font-pixel text-[12px] text-[#FFA07A]">📦 TechStore checking stock...</span>
+                    <span className="font-pixel text-[12px] text-[#B197FC]">🛡️ Authority validating...</span>
+                  </div>
                 </div>
               )}
 
@@ -532,7 +561,33 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* 4. SNES Dialogue Prompt Input Area */}
-      <div className="p-3 bg-[#FFF8E7] border-t-2 border-[#1A1320] shadow-[inset_0_2px_0_#F4E9C7]">
+      <div className="p-3 bg-[#FFF8E7] border-t-2 border-[#1A1320] shadow-[inset_0_2px_0_#F4E9C7] space-y-2">
+        {/* Quick Suggestion Chips */}
+        {messages.length <= 2 && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="font-display text-[7px] text-[#6B5878] mr-1">QUICK:</span>
+            {[
+              '📱 Phone under 14k',
+              '💻 Laptop under 45k',
+              '🎧 Headphones',
+              '⌚ Smartwatch',
+              '👟 Running shoes',
+              '🎒 Backpack',
+            ].map((chip) => (
+              <button
+                key={chip}
+                onClick={() => {
+                  const query = chip.replace(/^[^\s]+\s/, '');
+                  onSendMessage(query);
+                }}
+                className="px-2 py-0.5 bg-[#FFFDF5] border border-[#A899B5] font-pixel text-[11px] text-[#3D2E4A] hover:bg-[#4ECDC4] hover:text-[#FFFDF5] hover:border-[#1A1320] transition-all cursor-pointer"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-center gap-2">
           {/* Prompt Text Input */}
           <div className="flex-1 relative flex items-center bg-[#FFFDF5] border-2 border-[#1A1320] shadow-[inset_1px_1px_0_#F4E9C7]">
@@ -556,6 +611,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           >
             SEND ↵
           </PixelButton>
+        </div>
+
+        {/* Powered By Footer */}
+        <div className="flex items-center justify-center gap-1.5">
+          <span className="font-display text-[7px] text-[#A899B5]">
+            POWERED BY AGENTPAY — AI MULTI-AGENT COMMERCE ENGINE
+          </span>
         </div>
       </div>
     </div>

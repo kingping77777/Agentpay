@@ -17,12 +17,18 @@ from app.core.config import settings
 
 
 CHECKOUT_KEYWORDS = [
-    "checkout", "buy", "purchase", "place order", "pay", "payment",
-    "confirm order", "proceed", "complete purchase", "i want to buy"
+    "checkout", "place order", "pay now", "payment",
+    "confirm order", "proceed to checkout", "complete purchase",
+    "finalize order", "ready to pay", "i want to pay",
 ]
 MERCHANT_KEYWORDS = [
     "upsell", "recommend", "suggest", "bundle", "offer", "deal",
-    "promotion", "discount", "what else", "anything else"
+    "promotion", "discount", "what else", "anything else",
+    "more options", "alternatives", "similar products",
+]
+GREETING_KEYWORDS = [
+    "hello", "hi", "hey", "good morning", "good afternoon",
+    "what can you do", "help", "howdy", "hola",
 ]
 
 
