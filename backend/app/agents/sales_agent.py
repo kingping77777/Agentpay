@@ -42,8 +42,7 @@ Response Rules:
 
 
 def _get_client() -> genai.Client | None:
-    if not settings.GEMINI_API_KEY or settings.GEMINI_API_KEY.startswith("AQ."):
-        # Note: If invalid/demo key, return None to safely use intelligent offline brain
+    if not settings.GEMINI_API_KEY:
         return None
     try:
         return genai.Client(api_key=settings.GEMINI_API_KEY)
