@@ -6,12 +6,14 @@ export interface Product {
   category: string;
   brand: string;
   price: number;
+  original_price?: number;
   currency: string;
   description?: string;
   in_stock: boolean;
   stock: number;
   image_url?: string;
   rating?: number;
+  source?: string;
   specifications?: Record<string, string>;
 }
 

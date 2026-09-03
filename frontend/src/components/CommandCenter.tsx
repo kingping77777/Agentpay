@@ -264,7 +264,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=80';
                                       }}
                                     />
-                                    <span className="absolute top-1 right-1 px-1.5 py-0.5 bg-[#1A1320]/80 text-[#FFFDF5] font-display text-[7px] border border-[#FFFDF5]">
+                                    <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-[#FF6B6B] text-[#FFFDF5] font-display text-[7px] border border-[#1A1320] shadow-[1px_1px_0_#1A1320]">
+                                      {p.source || '⚡ LIVE STORE'}
+                                    </div>
+                                    <span className="absolute top-1 right-1 px-1.5 py-0.5 bg-[#1A1320]/90 text-[#FFFDF5] font-display text-[7px] border border-[#FFFDF5]">
                                       {p.brand.toUpperCase()}
                                     </span>
                                   </div>
