@@ -18,15 +18,15 @@ export const PhaserOffice: React.FC<PhaserOfficeProps> = ({ currentAgent, lastMe
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
       parent: gameContainerRef.current,
-      width: gameContainerRef.current.clientWidth || 540,
-      height: gameContainerRef.current.clientHeight || 500,
+      width: 540,
+      height: 480,
       backgroundColor: '#E5C896',
       physics: {
         default: 'arcade',
       },
       scene: [OfficeScene],
       scale: {
-        mode: Phaser.Scale.RESIZE,
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
       },
     };
