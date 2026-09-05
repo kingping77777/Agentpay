@@ -580,6 +580,69 @@ PRODUCTS = [
         "rating": 4.1,
         "stock": 50,
     },
+
+    # ── 11. Footwear & Running Shoes ──────────────────────────────────────────
+    {
+        "name": "Puma Softride Enzo Evo Running Shoes",
+        "category": "footwear",
+        "brand": "puma",
+        "description": "Softride EVA foam cushioning technology for extreme comfort, breathable mesh upper, and progressive clamshell collar design.",
+        "price": 2_899.00,
+        "sku": "PUM-SOFTRIDE-ENZO-01",
+        "specifications": {
+            "sole_material": "Softride EVA Midsole with zoned rubber outsole",
+            "upper_material": "Engineered Breathable Mesh",
+            "closure": "Lace-Up with TPU cage support",
+            "weight": "285g (lightweight responsive stride)",
+        },
+        "rating": 4.7,
+        "stock": 30,
+    },
+    {
+        "name": "Nike Revolution 6 Next Nature Running Shoes",
+        "category": "footwear",
+        "brand": "nike",
+        "description": "Intuitive comfort and flexible cushioning made with at least 20% recycled content by weight. Ideal for road running and training.",
+        "price": 3_495.00,
+        "sku": "NIK-REV6-NN-BLK",
+        "specifications": {
+            "cushioning": "Plush foam midsole for smooth ride",
+            "upper": "Lightweight breathable knit fabric",
+            "outsole": "Computer-generated generative traction pattern",
+        },
+        "rating": 4.8,
+        "stock": 25,
+    },
+    {
+        "name": "Adidas Ultraboost Light Running Shoes",
+        "category": "footwear",
+        "brand": "adidas",
+        "description": "Epic energy with the lightest BOOST midsole ever. Continental Better Rubber outsole delivers extraordinary traction in wet and dry conditions.",
+        "price": 9_999.00,
+        "sku": "ADI-ULTRABOOST-LT-01",
+        "specifications": {
+            "midsole": "Ultraboost Light (30% lighter BOOST material)",
+            "upper": "PRIMEKNIT+ textile upper with sock-like fit",
+            "stability": "Linear Energy Push (LEP) system",
+        },
+        "rating": 4.9,
+        "stock": 18,
+    },
+    {
+        "name": "Asics GEL-Kayano 30 Running Shoes",
+        "category": "footwear",
+        "brand": "asics",
+        "description": "Premium structured cushioning with 4D GUIDANCE SYSTEM for adaptive stability and pureGEL technology for softer landings.",
+        "price": 8_499.00,
+        "sku": "ASC-GEL-KAYANO30",
+        "specifications": {
+            "stability": "4D GUIDANCE SYSTEM",
+            "cushioning": "FF BLAST PLUS ECO cushioning with PureGEL",
+            "outsole": "AHARPLUS heel plug for superior durability",
+        },
+        "rating": 4.9,
+        "stock": 15,
+    },
 ]
 
 
@@ -687,6 +750,7 @@ async def seed() -> None:
                 "components": "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80",
                 "tablets": "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&auto=format&fit=crop&q=80",
                 "accessories": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=80",
+                "footwear": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=80",
             }
             img_url = p_data.get("image_url") or img_map.get(cat, "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&auto=format&fit=crop&q=80")
 

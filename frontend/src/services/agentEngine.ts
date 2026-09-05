@@ -699,6 +699,89 @@ export const UNIVERSAL_PRODUCTS: Product[] = [
       Waterproof: 'Rugged + Waterproof to 33ft (10m)',
     },
   },
+
+  // ── 15. Footwear & Running Shoes ───────────────────────────────────────────
+  {
+    id: 'prod-puma-softride-enzo',
+    name: 'Puma Softride Enzo Evo Running Shoes',
+    category: 'footwear',
+    brand: 'Puma',
+    price: 2899,
+    original_price: 4999,
+    currency: 'INR',
+    source: '🛍️ Flipkart',
+    description: 'Softride EVA foam cushioning technology for extreme comfort, breathable mesh upper, and progressive clamshell collar design.',
+    in_stock: true,
+    stock: 30,
+    rating: 4.7,
+    image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Sole_Material: 'Softride EVA Midsole with zoned rubber outsole',
+      Upper_Material: 'Engineered Breathable Mesh',
+      Closure: 'Lace-Up with TPU cage support',
+      Weight: '285g (lightweight responsive stride)',
+    },
+  },
+  {
+    id: 'prod-nike-revolution-6',
+    name: 'Nike Revolution 6 Next Nature Running Shoes',
+    category: 'footwear',
+    brand: 'Nike',
+    price: 3495,
+    original_price: 4995,
+    currency: 'INR',
+    source: '🛒 Amazon.in',
+    description: 'Intuitive comfort and flexible cushioning made with at least 20% recycled content by weight. Ideal for road running and training.',
+    in_stock: true,
+    stock: 25,
+    rating: 4.8,
+    image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Cushioning: 'Plush foam midsole for smooth ride',
+      Upper: 'Lightweight breathable knit fabric',
+      Outsole: 'Computer-generated generative traction pattern',
+    },
+  },
+  {
+    id: 'prod-adidas-ultraboost-light',
+    name: 'Adidas Ultraboost Light Running Shoes',
+    category: 'footwear',
+    brand: 'Adidas',
+    price: 9999,
+    original_price: 18999,
+    currency: 'INR',
+    source: '⚡ Croma',
+    description: 'Epic energy with the lightest BOOST midsole ever. Continental Better Rubber outsole delivers extraordinary traction in wet and dry conditions.',
+    in_stock: true,
+    stock: 18,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Midsole: 'Ultraboost Light (30% lighter BOOST material)',
+      Upper: 'PRIMEKNIT+ textile upper with sock-like fit',
+      Stability: 'Linear Energy Push (LEP) system',
+    },
+  },
+  {
+    id: 'prod-asics-gel-kayano-30',
+    name: 'Asics GEL-Kayano 30 Running Shoes',
+    category: 'footwear',
+    brand: 'Asics',
+    price: 8499,
+    original_price: 15999,
+    currency: 'INR',
+    source: '✨ Myntra',
+    description: 'Premium structured cushioning with 4D GUIDANCE SYSTEM for adaptive stability and pureGEL technology for softer landings.',
+    in_stock: true,
+    stock: 15,
+    rating: 4.9,
+    image_url: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80',
+    specifications: {
+      Stability: '4D GUIDANCE SYSTEM',
+      Cushioning: 'FF BLAST PLUS ECO cushioning with PureGEL',
+      Outsole: 'AHARPLUS heel plug for superior durability',
+    },
+  },
 ];
 
 // Helper: Extract budget & clean search keywords
@@ -731,14 +814,30 @@ export function synthesizeLiveEcommerceProducts(query: string, maxBudget: number
   const sources = ['🛒 Amazon.in', '🛍️ Flipkart', '⚡ Croma', '✨ Myntra', '📦 Tata CLiQ'];
 
   // Keyword image and category mappings
-  let category = 'electronics';
+  let category = 'consumer_goods';
   let imgUrl = 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=600&q=80';
   let brand = 'Brand';
 
-  if (cleanQ.includes('chair') || cleanQ.includes('desk') || cleanQ.includes('furniture')) {
+  if (cleanQ.includes('shoe') || cleanQ.includes('shoes') || cleanQ.includes('sneaker') || cleanQ.includes('sneakers') || cleanQ.includes('running') || cleanQ.includes('footwear') || cleanQ.includes('boot') || cleanQ.includes('boots') || cleanQ.includes('sandal') || cleanQ.includes('sandals')) {
+    category = 'footwear';
+    imgUrl = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80';
+    brand = cleanQ.includes('nike') ? 'Nike' : cleanQ.includes('puma') ? 'Puma' : cleanQ.includes('adidas') ? 'Adidas' : cleanQ.includes('asics') ? 'Asics' : 'Puma';
+  } else if (cleanQ.includes('jacket') || cleanQ.includes('hoodie') || cleanQ.includes('shirt') || cleanQ.includes('tshirt') || cleanQ.includes('jeans') || cleanQ.includes('cloth') || cleanQ.includes('dress')) {
+    category = 'clothing';
+    imgUrl = 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=600&q=80';
+    brand = cleanQ.includes('levis') ? "Levi's" : cleanQ.includes('zara') ? 'Zara' : cleanQ.includes('roadster') ? 'Roadster' : 'Wildcraft';
+  } else if (cleanQ.includes('protein') || cleanQ.includes('whey') || cleanQ.includes('creatine') || cleanQ.includes('gym') || cleanQ.includes('supplement')) {
+    category = 'fitness';
+    imgUrl = 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80';
+    brand = cleanQ.includes('on') || cleanQ.includes('optimum') ? 'Optimum Nutrition' : cleanQ.includes('muscleblaze') ? 'MuscleBlaze' : 'MyProtein';
+  } else if (cleanQ.includes('coffee') || cleanQ.includes('espresso') || cleanQ.includes('kettle') || cleanQ.includes('toaster') || cleanQ.includes('blender') || cleanQ.includes('kitchen') || cleanQ.includes('cooker')) {
+    category = 'kitchen';
+    imgUrl = 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?auto=format&fit=crop&w=600&q=80';
+    brand = cleanQ.includes('philips') ? 'Philips' : cleanQ.includes('morphy') ? 'Morphy Richards' : cleanQ.includes('prestige') ? 'Prestige' : 'Wonderchef';
+  } else if (cleanQ.includes('chair') || cleanQ.includes('desk') || cleanQ.includes('furniture') || cleanQ.includes('table')) {
     category = 'furniture';
     imgUrl = 'https://images.unsplash.com/photo-1580481077197-6a17b07d8b58?auto=format&fit=crop&w=600&q=80';
-    brand = cleanQ.includes('secretlab') ? 'Secretlab' : cleanQ.includes('green soul') ? 'Green Soul' : 'ErgoSmart';
+    brand = cleanQ.includes('secretlab') ? 'Secretlab' : cleanQ.includes('green soul') ? 'Green Soul' : cleanQ.includes('wakefit') ? 'Wakefit' : 'ErgoSmart';
   } else if (cleanQ.includes('tv') || cleanQ.includes('television')) {
     category = 'electronics';
     imgUrl = 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=600&q=80';
@@ -776,7 +875,7 @@ export function synthesizeLiveEcommerceProducts(query: string, maxBudget: number
   }
 
   // Base price calculation respecting budget
-  let basePrice = maxBudget > 0 ? Math.round(maxBudget * 0.88) : 14999;
+  let basePrice = maxBudget > 0 ? Math.round(maxBudget * 0.88) : (category === 'footwear' || category === 'clothing' ? 2999 : 14999);
   if (basePrice < 500) basePrice = 999;
 
   const item1Name = `${brand} Premium ${query.charAt(0).toUpperCase() + query.slice(1)}`;
@@ -1113,7 +1212,24 @@ export async function executeAgentPipeline(
   state.taskCount.SALES_AGENT += 1;
   const { keyword, maxBudget } = parseQuery(message);
 
-  const words = keyword.toLowerCase().split(/\s+/).filter((w) => w.length > 1);
+  const rawWords = keyword.toLowerCase().split(/\s+/).filter((w) => w.length > 1);
+  const searchStems = new Set<string>();
+  for (const rw of rawWords) {
+    searchStems.add(rw);
+    if (rw.endsWith('s') && !rw.endsWith('ss') && rw.length > 3) {
+      searchStems.add(rw.slice(0, -1));
+    } else {
+      searchStems.add(rw + 's');
+    }
+    if (['shoe', 'shoes', 'sneaker', 'sneakers', 'footwear', 'boot', 'boots'].includes(rw)) {
+      searchStems.add('shoe');
+      searchStems.add('shoes');
+      searchStems.add('footwear');
+      searchStems.add('sneaker');
+    }
+  }
+
+  const stemList = Array.from(searchStems);
 
   let matches = UNIVERSAL_PRODUCTS.filter((p) => {
     const pName = p.name.toLowerCase();
@@ -1125,7 +1241,7 @@ export async function executeAgentPipeline(
       pName.includes(keyword) ||
       pCat.includes(keyword) ||
       pBrand.includes(keyword) ||
-      words.some((w) => pName.includes(w) || pCat.includes(w) || pBrand.includes(w) || pDesc.includes(w));
+      stemList.some((w) => pName.includes(w) || pCat.includes(w) || pBrand.includes(w) || pDesc.includes(w));
 
     if (maxBudget > 0) {
       return textMatch && p.price <= maxBudget;

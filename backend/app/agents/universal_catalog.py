@@ -595,48 +595,7 @@ CATALOG_KNOWLEDGE: dict[str, dict[str, Any]] = {
 }
 
 
-# ── Universal AI Synthesizer Logic ───────────────────────────────────────────
-
-def synthesize_products_for_query(raw_query: str) -> list[dict]:
-    """
-    Synthesizes rich, domain-tailored product cards for ANY product request.
-    Applies real brand names, realistic pricing matching user budget, and detailed specs.
-    """
-    clean_keyword, user_budget = clean_search_query(raw_query)
-    lower_keyword = clean_keyword.lower()
-
-    # 1. Match against known knowledge domains
-    matched_domain = None
-    if any(w in lower_keyword for w in ["phone", "mobile", "smartphone", "android", "iphone", "5g phone", "samsung", "redmi", "oneplus", "poco", "realme", "vivo", "oppo", "iqoo"]):
-        matched_domain = "phone"
-    elif any(w in lower_keyword for w in ["shoe", "sneaker", "running", "footwear", "boot", "sandal", "slipper", "jogger", "training shoe", "nike", "adidas", "puma"]):
-        matched_domain = "shoe"
-    elif any(w in lower_keyword for w in ["jacket", "hoodie", "shirt", "tshirt", "t-shirt", "jeans", "coat", "clothing", "sweatshirt", "kurta", "trouser", "pant", "dress", "blazer", "sweater"]):
-        matched_domain = "jacket"
-    elif any(w in lower_keyword for w in ["protein", "creatine", "supplement", "whey", "gym", "bcaa", "pre-workout", "preworkout", "mass gainer", "vitamins"]):
-        matched_domain = "protein"
-    elif any(w in lower_keyword for w in ["coffee", "espresso", "maker", "kettle", "fryer", "blender", "kitchen", "mixer", "grinder", "oven", "microwave", "toaster", "juicer", "cooker", "pressure cooker"]):
-        matched_domain = "coffee"
-    elif any(w in lower_keyword for w in ["chair", "desk", "furniture", "table", "ergonomic", "standing desk", "bookshelf", "sofa", "bed", "mattress"]):
-        matched_domain = "chair"
-    elif any(w in lower_keyword for w in ["headphone", "earphone", "earbud", "earbuds", "headset", "tws", "bluetooth earbuds", "neckband", "airpod", "sony wh", "jbl"]):
-        matched_domain = "headphone"
-    elif any(w in lower_keyword for w in ["laptop", "notebook", "ultrabook", "macbook", "chromebook", "thinkpad", "ideapad", "gaming laptop"]):
-        matched_domain = "laptop"
-    elif any(w in lower_keyword for w in ["watch", "smartwatch", "wristwatch", "apple watch", "fitness band", "tracker", "fitbit", "noise watch"]):
-        matched_domain = "watch"
-    elif any(w in lower_keyword for w in ["tablet", "ipad", "tab", "drawing pad", "kindle", "e-reader"]):
-        matched_domain = "tablet"
-    elif any(w in lower_keyword for w in ["bag", "backpack", "luggage", "suitcase", "travel bag", "duffel", "laptop bag", "handbag", "tote"]):
-        matched_domain = "bag"
-    elif any(w in lower_keyword for w in ["camera", "dslr", "mirrorless", "gopro", "action camera", "webcam", "tripod"]):
-        matched_domain = "camera"
-    elif any(w in lower_keyword for w in ["speaker", "bluetooth speaker", "soundbar", "subwoofer", "home theater", "portable speaker"]):
-        matched_domain = "speaker"
-    elif any(w in lower_keyword for w in ["monitor", "gaming monitor", "curved monitor", "display", "4k monitor"]):
-        matched_domain = "monitor"
-    elif any(w in lower_keyword for w in ["keyboard", "mouse", "gaming keyboard", "mechanical keyboard", "wireless mouse", "mousepad"]):
-        matched_domain = "keyboard"
+# ── Category Images & Visual Resolver ────────────────────────────────────────
 
 CATEGORY_IMAGE_MAP: dict[str, str] = {
     "smartphones": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&auto=format&fit=crop&q=80",
@@ -645,6 +604,7 @@ CATEGORY_IMAGE_MAP: dict[str, str] = {
     "audio": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=80",
     "wearables": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=80",
     "footwear": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=80",
+    "shoes": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop&q=80",
     "clothing": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&auto=format&fit=crop&q=80",
     "fitness": "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=500&auto=format&fit=crop&q=80",
     "kitchen": "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=500&auto=format&fit=crop&q=80",
@@ -672,19 +632,63 @@ def resolve_product_image(cat: str, name: str) -> str:
         return CATEGORY_IMAGE_MAP["audio"]
     if any(k in lower for k in ["watch", "smartwatch", "fitness", "band", "fire-boltt", "noise"]):
         return CATEGORY_IMAGE_MAP["wearables"]
-    if any(k in lower for k in ["shoe", "sneaker", "running", "nike", "puma", "adidas"]):
+    if any(k in lower for k in ["shoe", "shoes", "sneaker", "sneakers", "running", "nike", "puma", "adidas", "asics", "footwear"]):
         return CATEGORY_IMAGE_MAP["footwear"]
-    if any(k in lower for k in ["jacket", "hoodie", "shirt", "clothing", "dress", "leather"]):
+    if any(k in lower for k in ["jacket", "hoodie", "shirt", "clothing", "dress", "leather", "jeans"]):
         return CATEGORY_IMAGE_MAP["clothing"]
-    if any(k in lower for k in ["protein", "whey", "creatine", "supplement"]):
+    if any(k in lower for k in ["protein", "whey", "creatine", "supplement", "fitness"]):
         return CATEGORY_IMAGE_MAP["fitness"]
-    if any(k in lower for k in ["coffee", "espresso", "maker", "kettle"]):
+    if any(k in lower for k in ["coffee", "espresso", "maker", "kettle", "kitchen"]):
         return CATEGORY_IMAGE_MAP["kitchen"]
     if any(k in lower for k in ["chair", "desk", "furniture", "table"]):
         return CATEGORY_IMAGE_MAP["furniture"]
     if any(k in lower for k in ["bag", "backpack", "rucksack", "tourister", "wildcraft"]):
         return CATEGORY_IMAGE_MAP["bags"]
     return CATEGORY_IMAGE_MAP.get(cat, CATEGORY_IMAGE_MAP["consumer_goods"])
+
+
+# ── Universal AI Synthesizer Logic ───────────────────────────────────────────
+
+def synthesize_products_for_query(raw_query: str) -> list[dict]:
+    """
+    Synthesizes rich, domain-tailored product cards for ANY product request.
+    Applies real brand names, realistic pricing matching user budget, and detailed specs.
+    """
+    clean_keyword, user_budget = clean_search_query(raw_query)
+    lower_keyword = clean_keyword.lower()
+
+    # 1. Match against known knowledge domains
+    matched_domain = None
+    if any(w in lower_keyword for w in ["phone", "mobile", "smartphone", "android", "iphone", "5g phone", "samsung", "redmi", "oneplus", "poco", "realme", "vivo", "oppo", "iqoo"]):
+        matched_domain = "phone"
+    elif any(w in lower_keyword for w in ["shoe", "shoes", "sneaker", "sneakers", "running", "footwear", "boot", "boots", "sandal", "sandals", "slipper", "slippers", "jogger", "training shoe", "nike", "adidas", "puma", "asics", "skechers"]):
+        matched_domain = "shoe"
+    elif any(w in lower_keyword for w in ["jacket", "hoodie", "shirt", "tshirt", "t-shirt", "jeans", "coat", "clothing", "sweatshirt", "kurta", "trouser", "pant", "dress", "blazer", "sweater"]):
+        matched_domain = "jacket"
+    elif any(w in lower_keyword for w in ["protein", "creatine", "supplement", "whey", "gym", "bcaa", "pre-workout", "preworkout", "mass gainer", "vitamins"]):
+        matched_domain = "protein"
+    elif any(w in lower_keyword for w in ["coffee", "espresso", "maker", "kettle", "fryer", "blender", "kitchen", "mixer", "grinder", "oven", "microwave", "toaster", "juicer", "cooker", "pressure cooker"]):
+        matched_domain = "coffee"
+    elif any(w in lower_keyword for w in ["chair", "desk", "furniture", "table", "ergonomic", "standing desk", "bookshelf", "sofa", "bed", "mattress"]):
+        matched_domain = "chair"
+    elif any(w in lower_keyword for w in ["headphone", "earphone", "earbud", "earbuds", "headset", "tws", "bluetooth earbuds", "neckband", "airpod", "sony wh", "jbl"]):
+        matched_domain = "headphone"
+    elif any(w in lower_keyword for w in ["laptop", "notebook", "ultrabook", "macbook", "chromebook", "thinkpad", "ideapad", "gaming laptop"]):
+        matched_domain = "laptop"
+    elif any(w in lower_keyword for w in ["watch", "smartwatch", "wristwatch", "apple watch", "fitness band", "tracker", "fitbit", "noise watch"]):
+        matched_domain = "watch"
+    elif any(w in lower_keyword for w in ["tablet", "ipad", "tab", "drawing pad", "kindle", "e-reader"]):
+        matched_domain = "tablet"
+    elif any(w in lower_keyword for w in ["bag", "backpack", "luggage", "suitcase", "travel bag", "duffel", "laptop bag", "handbag", "tote"]):
+        matched_domain = "bag"
+    elif any(w in lower_keyword for w in ["camera", "dslr", "mirrorless", "gopro", "action camera", "webcam", "tripod"]):
+        matched_domain = "camera"
+    elif any(w in lower_keyword for w in ["speaker", "bluetooth speaker", "soundbar", "subwoofer", "home theater", "portable speaker"]):
+        matched_domain = "speaker"
+    elif any(w in lower_keyword for w in ["monitor", "gaming monitor", "curved monitor", "display", "4k monitor"]):
+        matched_domain = "monitor"
+    elif any(w in lower_keyword for w in ["keyboard", "mouse", "gaming keyboard", "mechanical keyboard", "wireless mouse", "mousepad"]):
+        matched_domain = "keyboard"
 
     if matched_domain and matched_domain in CATALOG_KNOWLEDGE:
         domain_info = CATALOG_KNOWLEDGE[matched_domain]
@@ -714,11 +718,16 @@ def resolve_product_image(cat: str, name: str) -> str:
             return matching_products[:8]
 
     # 2. Universal Smart Fallback Generator for any arbitrary product term
-    target_name = clean_keyword.title() if clean_keyword else "Premium Tech Item"
+    target_name = clean_keyword.title() if clean_keyword else "Premium Item"
     target_cat = "consumer_goods"
 
     # Smart category inference from context
     cat_map = {
+        "footwear": ["shoe", "shoes", "sneaker", "sneakers", "boot", "boots", "sandal", "sandals", "slipper", "slippers", "clog"],
+        "clothing": ["shirt", "tshirt", "t-shirt", "pant", "pants", "jeans", "jacket", "hoodie", "dress", "kurta", "suit", "blazer", "trouser", "trousers"],
+        "fitness": ["protein", "creatine", "supplement", "whey", "gym", "bcaa", "mass gainer", "shaker"],
+        "kitchen": ["cooker", "pan", "pot", "blender", "toaster", "kettle", "fryer", "microwave", "oven", "knife", "utensil"],
+        "furniture": ["chair", "desk", "table", "sofa", "bed", "mattress", "cushion", "curtain", "lamp"],
         "electronics": ["charger", "cable", "adapter", "power bank", "usb", "hub", "dongle"],
         "gaming": ["controller", "gamepad", "console", "joystick", "vr"],
         "beauty": ["perfume", "cream", "serum", "moisturizer", "sunscreen", "shampoo", "conditioner"],
@@ -735,6 +744,11 @@ def resolve_product_image(cat: str, name: str) -> str:
 
     # Realistic brand pools by inferred category
     brand_pools = {
+        "footwear": ["Nike", "Puma", "Adidas", "Asics", "New Balance", "Skechers"],
+        "clothing": ["Roadster", "Levis", "Zara", "Wildcraft", "H&M", "Columbia"],
+        "fitness": ["Optimum Nutrition", "MuscleBlaze", "Dymatize", "MyProtein", "As-It-Is"],
+        "kitchen": ["Philips", "Morphy Richards", "Prestige", "Pigeon", "Wonderchef"],
+        "furniture": ["Green Soul", "Featherlite", "Wakefit", "Sleep Company", "Ikea"],
         "electronics": ["Anker", "Belkin", "Baseus", "Portronics", "Ambrane", "Stuffcool"],
         "gaming": ["Cosmic Byte", "Redgear", "HyperX", "Ant Esports", "Logitech G", "Razer"],
         "beauty": ["Mamaearth", "The Body Shop", "L'Oreal", "Nivea", "Plum", "Minimalist"],
@@ -751,16 +765,16 @@ def resolve_product_image(cat: str, name: str) -> str:
     if user_budget > 0:
         base_price = round(user_budget * 0.95, -1)
     else:
-        base_price = 2499.00
+        base_price = 2499.00 if target_cat in ("footwear", "clothing", "kitchen", "beauty") else 4999.00
 
     # Build 6 varied branded models & recommended alternatives
     model_variants = [
-        (f"{brands[0]} {target_name} Flagship Pro Edition", brands[0], base_price, 4.9, "Top-rated bestseller with premium aerospace-grade materials, fastest response time, and 2-year warranty."),
-        (f"{brands[1]} {target_name} Ultra Performance", brands[1], round(base_price * 0.88, -1), 4.8, "High-performance edition engineered for durability, extended battery lifespan, and ergonomic comfort."),
-        (f"{brands[2]} {target_name} Neo Smart Edition", brands[2], round(base_price * 0.78, -1), 4.7, "Feature-packed everyday companion with smart AI optimization and quick-charge support."),
-        (f"{brands[3 % len(brands)]} {target_name} Essential Series", brands[3 % len(brands)], round(base_price * 0.65, -1), 4.5, "Maximum value-for-money option offering all core features at an unbeatable budget price."),
-        (f"{brands[4 % len(brands)]} {target_name} Compact Plus", brands[4 % len(brands)], round(base_price * 0.55, -1), 4.6, "Ultra-lightweight portable variant designed for on-the-go professionals and students."),
-        (f"{brands[5 % len(brands)]} {target_name} Studio Custom", brands[5 % len(brands)], round(base_price * 0.92, -1), 4.8, "Custom-tuned studio edition with enhanced precision engineering and VIP courier dispatch."),
+        (f"{brands[0]} {target_name} Flagship Pro Edition", brands[0], base_price, 4.9, f"Top-rated bestseller with premium materials, maximum durability, and official warranty."),
+        (f"{brands[1]} {target_name} Ultra Performance", brands[1], round(base_price * 0.88, -1), 4.8, f"High-performance edition engineered for durability, longevity, and ergonomic comfort."),
+        (f"{brands[2]} {target_name} Neo Smart Edition", brands[2], round(base_price * 0.78, -1), 4.7, f"Feature-packed everyday companion with modern styling and high user satisfaction."),
+        (f"{brands[3 % len(brands)]} {target_name} Essential Series", brands[3 % len(brands)], round(base_price * 0.65, -1), 4.5, f"Maximum value-for-money option offering all core features at an unbeatable budget price."),
+        (f"{brands[4 % len(brands)]} {target_name} Compact Plus", brands[4 % len(brands)], round(base_price * 0.55, -1), 4.6, f"Ultra-lightweight portable variant designed for on-the-go professionals and students."),
+        (f"{brands[5 % len(brands)]} {target_name} Studio Custom", brands[5 % len(brands)], round(base_price * 0.92, -1), 4.8, f"Custom-tuned edition with enhanced precision engineering and VIP courier dispatch."),
     ]
 
     synth_results = []
@@ -773,7 +787,7 @@ def resolve_product_image(cat: str, name: str) -> str:
             "description": m_desc,
             "specifications": {
                 "grade": "Certified Grade-A Materials",
-                "features": f"Optimized {clean_keyword} architecture with premium finish",
+                "features": f"Optimized {clean_keyword} design with premium build quality",
                 "warranty": "1 Year Official Brand Warranty",
                 "dispatch": "Free 2-Day Priority Express Shipping",
             },

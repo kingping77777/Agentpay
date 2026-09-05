@@ -119,6 +119,8 @@ async def chat(
         "order_total": response.get("order_total"),
         "recommendations": response.get("recommendations", []),
         "promotions": response.get("promotions", []),
+        "a2a_dialogue": response.get("a2a_dialogue", []),
+        "web_results": response.get("web_results", []),
         "duration_ms": response.get("duration_ms", 0),
     }
 

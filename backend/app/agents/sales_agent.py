@@ -175,9 +175,19 @@ Respond with ONLY valid JSON, no markdown fences."""
                 limit=6,
             )
 
+            # If no matches with strict category/brand, retry with just query string
+            if len(products_found) == 0 and (cat_str or brand_str):
+                products_found = await db_tools.search_products(
+                    db,
+                    merchant_id=merchant_id,
+                    query=query_str or clean_kw,
+                    max_price=max_p,
+                    limit=6,
+                )
+
             # B. If no products in DB meet the criteria (or budget), synthesize domain-accurate products
             if len(products_found) == 0:
-                synthesized = synthesize_products_for_query(message)
+                synthesized = synthesize_products_for_query(message) or []
                 products_found = []
                 for sp in synthesized:
                     dyn_p = await db_tools.register_dynamic_product(
@@ -185,10 +195,12 @@ Respond with ONLY valid JSON, no markdown fences."""
                         merchant_id=merchant_id,
                         name=sp["name"],
                         category=sp.get("category", "consumer_goods"),
-                        brand=sp.get("brand", "brand"),
+                        brand=sp.get("brand", "generic"),
                         price=float(sp["price"]),
                         description=sp.get("description", ""),
                         specifications=sp.get("specifications", {}),
+                        image_url=sp.get("image_url", ""),
+                        rating=float(sp.get("rating", 4.8)),
                     )
                     products_found.append(dyn_p)
 
@@ -202,7 +214,7 @@ Respond with ONLY valid JSON, no markdown fences."""
             )
             # If not in DB, search & register dynamically
             if not products_found:
-                synth = synthesize_products_for_query(product_name)
+                synth = synthesize_products_for_query(product_name) or []
                 first_item = synth[0] if synth else {
                     "name": product_name.title(),
                     "category": "consumer_goods",
@@ -210,6 +222,8 @@ Respond with ONLY valid JSON, no markdown fences."""
                     "price": 2999.00,
                     "description": f"Authentic {product_name} with official warranty.",
                     "specifications": {"type": "Standard", "warranty": "1 Year"},
+                    "image_url": "",
+                    "rating": 4.8,
                 }
                 dyn_p = await db_tools.register_dynamic_product(
                     db,
@@ -220,6 +234,8 @@ Respond with ONLY valid JSON, no markdown fences."""
                     price=float(first_item["price"]),
                     description=first_item.get("description", ""),
                     specifications=first_item.get("specifications", {}),
+                    image_url=first_item.get("image_url", ""),
+                    rating=float(first_item.get("rating", 4.8)),
                 )
                 products_found = [dyn_p]
 

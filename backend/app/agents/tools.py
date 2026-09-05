@@ -45,7 +45,23 @@ async def search_products(
         )
     )
     if query:
-        words = [w for w in query.strip().split() if len(w) > 1 and w.lower() not in ("the", "and", "for", "with", "show", "me", "some", "any", "want", "under", "below")]
+        raw_words = [w.strip().lower() for w in query.strip().split() if len(w.strip()) > 1 and w.lower() not in ("the", "and", "for", "with", "show", "me", "some", "any", "want", "under", "below", "need", "find", "buy")]
+        words = set()
+        for rw in raw_words:
+            words.add(rw)
+            # Add stems for plural/singular
+            if rw.endswith(("ches", "shes", "xes", "sses", "zes")) and len(rw) > 4:
+                words.add(rw[:-2])
+            elif rw.endswith("ies") and len(rw) > 4:
+                words.add(rw[:-3] + "y")
+            elif rw.endswith("s") and not rw.endswith("ss") and len(rw) > 3:
+                words.add(rw[:-1])
+            else:
+                words.add(rw + "s")
+            # Category synonyms
+            if rw in ("shoe", "shoes", "sneaker", "sneakers", "boots", "boot", "footwear"):
+                words.update(["shoe", "shoes", "sneaker", "footwear"])
+
         if words:
             word_clauses = []
             for w in words:
@@ -81,7 +97,7 @@ async def search_products(
             "currency": p.currency,
             "description": p.description or "",
             "specifications": p.specifications or {},
-            "rating": float(p.rating) if p.rating else None,
+            "rating": float(p.rating) if p.rating else 4.7,
             "image_url": p.image_url or "",
             "in_stock": (p.inventory.available_quantity > 0) if p.inventory else False,
             "stock": p.inventory.available_quantity if p.inventory else 0,
@@ -99,8 +115,10 @@ async def register_dynamic_product(
     price: float = 9999.00,
     description: str = "",
     specifications: dict | None = None,
+    image_url: str = "",
+    rating: float = 4.8,
 ) -> dict:
-    """Dynamically register a newly searched tech product into the live database catalog."""
+    """Dynamically register a newly searched tech/consumer product into the live database catalog."""
     p_id = uuid.uuid4()
     sku = f"DYN-{brand[:3].upper()}-{p_id.hex[:6].upper()}"
     product = Product(
@@ -113,8 +131,9 @@ async def register_dynamic_product(
         price=price,
         currency="INR",
         sku=sku,
-        specifications=specifications or {"type": "Electronic Tech", "warranty": "1 Year Standard"},
-        rating=4.7,
+        specifications=specifications or {"type": "Consumer Product", "warranty": "1 Year Standard"},
+        image_url=image_url or None,
+        rating=rating,
         is_active=True,
     )
     db.add(product)
@@ -138,7 +157,8 @@ async def register_dynamic_product(
         "currency": "INR",
         "description": product.description,
         "specifications": product.specifications,
-        "rating": 4.7,
+        "image_url": product.image_url or "",
+        "rating": float(product.rating) if product.rating else 4.7,
         "in_stock": True,
         "stock": 15,
     }
